@@ -1,4 +1,3 @@
-Pillow==6.0.0
 yacs
 opencv-python
 cython-bbox
@@ -9,3 +8,4 @@ numba
 matplotlib
 lap
 openpyxl
+Pillow==6.2.2
