@@ -73,7 +73,7 @@ ${FAIRMOT_ROOT}
            └——————hrnet_w32-36af842e.pth
 ```
 * **Baseline model**
-Our baseline FairMOT model can be downloaded here: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu], code: 88yn](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA).
+Our baseline FairMOT model can be downloaded here: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA).
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
