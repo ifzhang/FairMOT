@@ -1,0 +1,11 @@
+Pillow==6.0.0
+yacs
+opencv-python
+cython-bbox
+numba
+progress
+motmetrics
+numba
+matplotlib
+lap
+openpyxl
