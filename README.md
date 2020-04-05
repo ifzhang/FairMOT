@@ -63,8 +63,8 @@ to generate the labels of 2DMOT15 and MOT20.
 
 ## Pretrained models and baseline model
 * **Pretrained models**
-DLA-34 COCO pretrained model: [DLA-34 official](https://drive.google.com/file/d/1pl_-ael8wERdUREEnaIfqOV_VF2bEVRT/view)
-HRNet-W-32 ImageNet pretrained model: [HRNet-W32 official](https://drive.google.com/drive/folders/1E6j6W7RqGhW1o7UHgiQ9X4g8fVJRU9TX)
+DLA-34 COCO pretrained model: [DLA-34 official](https://drive.google.com/file/d/1pl_-ael8wERdUREEnaIfqOV_VF2bEVRT/view).
+HRNet-W-32 ImageNet pretrained model: [HRNet-W32 official](https://drive.google.com/drive/folders/1E6j6W7RqGhW1o7UHgiQ9X4g8fVJRU9TX).
 After downloading, you should put the pretrained models in the following structure:
 ```
 ${FAIRMOT_ROOT}
