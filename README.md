@@ -16,10 +16,9 @@ There has been remarkable progress on object detection and re-identification in 
  All of the results are obtained on the [MOT challenge](https://motchallenge.net) evaluation server under the “private detector” protocol. We rank first among all the trackers on 2DMOT15, MOT17 and the recently released (2020.02.29) MOT20. Note that our IDF1 score remarkably outperforms other one-shot MOT trackers by more than **10 points**. The tracking speed of the entire system can reach up to **30 FPS**.
 
 ### Video demos on MOT challenge test set
-<img src="assets/MOT15.gif" width="200"/>   
-<img src="assets/MOT16.gif" width="200"/>
-<img src="assets/MOT17.gif" width="200"/>   
-<img src="assets/MOT20.gif" width="200"/>
+<img src="assets/MOT15.gif" width="200"/>   <img src="assets/MOT16.gif" width="200"/>
+<img src="assets/MOT17.gif" width="200"/>   <img src="assets/MOT20.gif" width="200"/>
+
 
 ## Installation
 * Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
@@ -74,7 +73,7 @@ ${FAIRMOT_ROOT}
            └——————hrnet_w32-36af842e.pth
 ```
 * **Baseline model**
-Our baseline FairMOT model can be downloaded here: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA),code: 88yn.
+Our baseline FairMOT model can be downloaded here: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu], code: 88yn](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA).
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
