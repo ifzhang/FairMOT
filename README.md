@@ -2,7 +2,7 @@
 A simple baseline for one-shot multi-object tracking:
 ![](assets/pipeline.png)
 ## Abstract
-There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object  tracking.  However,  little  attention  has  been  focused  on  accomplishing the two tasks in a single network to improve the inference speed.The  initial  attempts  along  this  path  ended  up  with  degraded  results mainly because the re-identification branch is not appropriately learned.In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS.We hope this baseline could inspire and help evaluate new ideas in this field.
+There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. We hope this baseline could inspire and help evaluate new ideas in this field.
 
 ## Tracking performance
 ### Results on MOT challenge test set
