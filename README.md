@@ -1,6 +1,9 @@
 # FairMOT
 A simple baseline for one-shot multi-object tracking:
 ![](assets/pipeline.png)
+> [**A Simple Baseline for Multi-Object Tracking**](http://arxiv.org/abs/2004.01888),            
+> Yifu Zhang, Chunyu Wang, Xinggang Wang, Wenjun Zeng, Wenyu Liu,        
+> *arXiv technical report ([arXiv 2004.01888](http://arxiv.org/abs/2004.01888))*
 ## Abstract
 There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. We hope this baseline could inspire and help evaluate new ideas in this field.
 
@@ -131,3 +134,14 @@ You can change --input-video and --output-root to get the demos of your own vide
 
 ## Acknowledgement
 A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https://github.com/Zhongdao/Towards-Realtime-MOT) and [xingyizhou/CenterNet](https://github.com/xingyizhou/CenterNet). Thanks for their wonderful works.
+
+## Citation
+
+```
+@article{zhang2020simple,
+  title={A Simple Baseline for Multi-Object Tracking},
+  author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu},
+  journal={arXiv preprint arXiv:2004.01888},
+  year={2020}
+}
+```
