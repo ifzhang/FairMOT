@@ -68,7 +68,7 @@ to generate the labels of 2DMOT15 and MOT20. The seqinfo.ini files of 2DMOT15 ca
 * **Pretrained models**
 
 DLA-34 COCO pretrained model: [DLA-34 official](https://drive.google.com/file/d/1pl_-ael8wERdUREEnaIfqOV_VF2bEVRT/view).
-HRNet-W-32 ImageNet pretrained model: [HRNet-W32 official](https://drive.google.com/drive/folders/1E6j6W7RqGhW1o7UHgiQ9X4g8fVJRU9TX).
+HRNetV2 ImageNet pretrained model: [HRNetV2-W18 official](https://1drv.ms/u/s!Aus8VCZ_C_33cMkPimlmClRvmpw), [HRNetV2-W32 official](https://1drv.ms/u/s!Aus8VCZ_C_33dYBMemi9xOUFR0w).
 After downloading, you should put the pretrained models in the following structure:
 ```
 ${FAIRMOT_ROOT}
