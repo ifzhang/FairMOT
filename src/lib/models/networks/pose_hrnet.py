@@ -7,11 +7,13 @@ import logging
 
 import torch
 import torch.nn as nn
+import numpy as np
+import torch.nn.functional as F
 
 from .config import cfg, update_config
 
 
-BN_MOMENTUM = 0.1
+BN_MOMENTUM = 0.01
 logger = logging.getLogger(__name__)
 
 
@@ -314,7 +316,7 @@ class PoseHighResolutionNet(nn.Module):
         self.transition3 = self._make_transition_layer(
             pre_stage_channels, num_channels)
         self.stage4, pre_stage_channels = self._make_stage(
-            self.stage4_cfg, num_channels, multi_scale_output=False)
+            self.stage4_cfg, num_channels, multi_scale_output=True)
 
         logger.info('=> init weights from normal distribution')
         for m in self.modules():
@@ -335,11 +337,23 @@ class PoseHighResolutionNet(nn.Module):
 
         self.heads = heads
 
+        last_inp_channels = np.int(np.sum(pre_stage_channels))
+
+        self.last_layer = nn.Sequential(
+            nn.Conv2d(
+                in_channels=last_inp_channels,
+                out_channels=64,
+                kernel_size=1,
+                stride=1,
+                padding=0),
+            nn.BatchNorm2d(64, momentum=BN_MOMENTUM),
+            nn.ReLU(inplace=True),
+        )
         head_conv = 256
         for head in self.heads:
             classes = self.heads[head]
             fc = nn.Sequential(
-                nn.Conv2d(pre_stage_channels[0], head_conv,
+                nn.Conv2d(64, head_conv,
                           kernel_size=3, padding=1, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Conv2d(head_conv, classes,
@@ -465,7 +479,10 @@ class PoseHighResolutionNet(nn.Module):
         x_list = []
         for i in range(self.stage3_cfg['NUM_BRANCHES']):
             if self.transition2[i] is not None:
-                x_list.append(self.transition2[i](y_list[-1]))
+                if i < self.stage2_cfg['NUM_BRANCHES']:
+                    x_list.append(self.transition2[i](y_list[i]))
+                else:
+                    x_list.append(self.transition2[i](y_list[-1]))
             else:
                 x_list.append(y_list[i])
         y_list = self.stage3(x_list)
@@ -473,14 +490,27 @@ class PoseHighResolutionNet(nn.Module):
         x_list = []
         for i in range(self.stage4_cfg['NUM_BRANCHES']):
             if self.transition3[i] is not None:
-                x_list.append(self.transition3[i](y_list[-1]))
+                if i < self.stage3_cfg['NUM_BRANCHES']:
+                    x_list.append(self.transition3[i](y_list[i]))
+                else:
+                    x_list.append(self.transition3[i](y_list[-1]))
             else:
                 x_list.append(y_list[i])
-        y_list = self.stage4(x_list)
+        x = self.stage4(x_list)
+
+        # Upsampling
+        x0_h, x0_w = x[0].size(2), x[0].size(3)
+        x1 = F.upsample(x[1], size=(x0_h, x0_w), mode='bilinear')
+        x2 = F.upsample(x[2], size=(x0_h, x0_w), mode='bilinear')
+        x3 = F.upsample(x[3], size=(x0_h, x0_w), mode='bilinear')
+
+        x = torch.cat([x[0], x1, x2, x3], 1)
+
+        x = self.last_layer(x)
 
         z = {}
         for head in self.heads:
-            z[head] = self.__getattr__(head)(y_list[0])
+            z[head] = self.__getattr__(head)(x)
         return [z]
 
     def init_weights(self, pretrained=''):
@@ -507,7 +537,12 @@ def fill_fc_weights(layers):
 
 
 def get_pose_net(num_layers, heads, head_conv):
-    cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w32.yaml'
+    if num_layers == 32:
+        cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w32.yaml'
+    elif num_layers == 18:
+        cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w18.yaml'
+    else:
+        cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w18.yaml'
     update_config(cfg, cfg_dir)
     model = PoseHighResolutionNet(cfg, heads)
     model.init_weights(cfg.MODEL.PRETRAINED)
