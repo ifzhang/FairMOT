@@ -62,7 +62,7 @@ cd src
 python gen_labels_15.py
 python gen_labels_20.py
 ```
-to generate the labels of 2DMOT15 and MOT20.
+to generate the labels of 2DMOT15 and MOT20. The seqinfo.ini files of 2DMOT15 can be downloaded here [[Google]](https://drive.google.com/open?id=1kJYySZy7wyETH4fKMzgJrYUrTfxKlN1w), [[Baidu],code:8o0w](https://pan.baidu.com/s/1zb5tBW7-YTzWOXpd9IzS0g).
 
 ## Pretrained models and baseline model
 * **Pretrained models**
