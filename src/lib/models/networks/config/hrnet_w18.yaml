@@ -28,7 +28,7 @@ MODEL:
   NUM_JOINTS: 17
   #PRETRAINED: '/home/yfzhang/PycharmProjects/FairMOT/models/pose_hrnet_w32_384x288.pth'
   #PRETRAINED: '/home/yfzhang/PycharmProjects/FairMOT/models/hrnet_w32-36af842e.pth'
-  PRETRAINED: '/home/yfzhang/PycharmProjects/FairMOT/models/hrnetv2_w18_imagenet_pretrained.pth'
+  PRETRAINED: '../models/hrnetv2_w18_imagenet_pretrained.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:
   - 192
