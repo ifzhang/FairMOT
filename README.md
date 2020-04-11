@@ -74,7 +74,8 @@ After downloading, you should put the pretrained models in the following structu
 ${FAIRMOT_ROOT}
    └——————models
            └——————ctdet_coco_dla_2x.pth
-           └——————hrnet_w32-36af842e.pth
+           └——————hrnetv2_w32_imagenet_pretrained.pth
+           └——————hrnetv2_w18_imagenet_pretrained.pth
 ```
 * **Baseline model**
 
