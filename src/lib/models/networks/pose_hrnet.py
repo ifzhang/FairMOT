@@ -538,11 +538,11 @@ def fill_fc_weights(layers):
 
 def get_pose_net(num_layers, heads, head_conv):
     if num_layers == 32:
-        cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w32.yaml'
+        cfg_dir = '../src/lib/models/networks/config/hrnet_w32.yaml'
     elif num_layers == 18:
-        cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w18.yaml'
+        cfg_dir = '../src/lib/models/networks/config/hrnet_w18.yaml'
     else:
-        cfg_dir = '/home/yfzhang/PycharmProjects/FairMOT/src/lib/models/networks/config/hrnet_w18.yaml'
+        cfg_dir = '../src/lib/models/networks/config/hrnet_w18.yaml'
     update_config(cfg, cfg_dir)
     model = PoseHighResolutionNet(cfg, heads)
     model.init_weights(cfg.MODEL.PRETRAINED)
