@@ -8,4 +8,9 @@ numba
 matplotlib
 lap
 openpyxl
+numpy
+torch
+torchvision
+tensorboardX
+scipy
 Pillow==6.2.2
