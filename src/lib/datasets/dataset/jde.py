@@ -395,7 +395,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         self.nF = sum(self.nds)
         self.width = img_size[0]
         self.height = img_size[1]
-        self.max_objs = 400
+        self.max_objs = opt.K
         self.augment = augment
         self.transforms = transforms
 

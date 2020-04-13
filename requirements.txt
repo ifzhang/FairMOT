@@ -1,6 +1,7 @@
 yacs
 opencv-python
 cython-bbox
+scipy
 numba
 progress
 motmetrics
@@ -9,3 +10,4 @@ matplotlib
 lap
 openpyxl
 Pillow==6.2.2
+tensorboardX
