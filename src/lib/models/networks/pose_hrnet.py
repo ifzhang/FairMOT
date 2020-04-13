@@ -521,7 +521,7 @@ class PoseHighResolutionNet(nn.Module):
             need_init_state_dict = {}
             for name, m in pretrained_state_dict.items():
                 if name.split('.')[0] in self.pretrained_layers \
-                   or self.pretrained_layers[0] is '*':
+                   or self.pretrained_layers[0] == '*':
                     need_init_state_dict[name] = m
             self.load_state_dict(need_init_state_dict, strict=False)
         elif pretrained:
