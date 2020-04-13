@@ -1,6 +1,6 @@
 import torch
 from torch.autograd import Variable
-from torch.nn.parallel._functions import Scatter, Gather
+from torch.nn.parallel._functions import Scatter
 
 
 def scatter(inputs, target_gpus, dim=0, chunk_sizes=None):
