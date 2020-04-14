@@ -79,12 +79,13 @@ ${FAIRMOT_ROOT}
 ```
 * **Baseline model**
 
-Our baseline FairMOT model can be downloaded here: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA).
+Our baseline FairMOT model can be downloaded here: DLA-34: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA). HRNetV2_W18: [[Google]](https://drive.google.com/open?id=1hxqE5QuzGCa6sgyBvNYhywmyohmioVAO) [[Baidu, code: 7jb1]](https://pan.baidu.com/s/1yQxXh0FuPLoFfeupHGZlCw).
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
    └——————models
            └——————all_dla34.pth
+           └——————all_hrnet_v2_w18.pth
            └——————...
 ```
 
@@ -129,9 +130,16 @@ Results of the test set all need to be evaluated on the MOT challenge server. Yo
 You can input a raw video and get the demo video by running src/demo.py and get the mp4 format of the demo video:
 ```
 cd src
-python demo.py mot --load_model ../models/all_dla34.pth
+python demo.py mot --load_model ../models/all_dla34.pth --conf_thres 0.4
 ```
 You can change --input-video and --output-root to get the demos of your own videos.
+
+If you have difficulty building DCNv2 and thus cannot use the DLA-34 baseline model, you can run the demo with the HRNetV2_w18 baseline model: 
+```
+cd src
+python demo.py mot --load_model ../models/all_hrnet_v2_w18.pth --arch hrnet_w18 --reid_dim 128 --conf_thres 0.4
+```
+--conf_thres can be set from 0.3 to 0.7 depending on your own videos.
 
 ## Acknowledgement
 A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https://github.com/Zhongdao/Towards-Realtime-MOT) and [xingyizhou/CenterNet](https://github.com/xingyizhou/CenterNet). Thanks for their wonderful works.
