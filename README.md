@@ -1,4 +1,4 @@
-# FairMOT BrainlessDylan's Fork
+# FairMOT
 A simple baseline for one-shot multi-object tracking:
 ![](assets/pipeline.png)
 > [**A Simple Baseline for Multi-Object Tracking**](http://arxiv.org/abs/2004.01888),            
@@ -23,18 +23,16 @@ There has been remarkable progress on object detection and re-identification in 
 <img src="assets/MOT17.gif" width="400"/>   <img src="assets/MOT20.gif" width="400"/>
 
 
-## Installation ( Only Tested on Arch Linux ) 
+## Installation
 * Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
 * Install dependencies. We use python 3.7 and pytorch >= 1.2.0
-* chmod +x ./update to be able to run the updater if it doesn't work OOTB
 ```
-./update to check of there is any updates that have happened to the repo
 conda create -n FairMOT
 conda activate FairMOT
 conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
 cd ${FAIRMOT_ROOT}
 pip install -r requirements.txt
-cd src/lib/models/networks/DCNv2 sh make.sh
+cd src/lib/models/networks/DCNv2 && sh make.sh
 ```
 * We use [DCNv2](https://github.com/CharlesShang/DCNv2) in our backbone network and more details can be found in their repo. 
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
@@ -151,7 +149,7 @@ A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https:
 ```
 @article{zhang2020simple,
   title={A Simple Baseline for Multi-Object Tracking},
-  author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu, Dylan Roberts},
+  author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu},
   journal={arXiv preprint arXiv:2004.01888},
   year={2020}
 }
