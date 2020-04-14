@@ -3,16 +3,16 @@ from __future__ import division
 from __future__ import print_function
 
 import math
+
 import torch
-import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-
-from models.losses import FocalLoss, TripletLoss
-from models.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
 from models.decode import mot_decode
+from models.losses import FocalLoss
+from models.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
 from models.utils import _sigmoid, _tranpose_and_gather_feat
 from utils.post_process import ctdet_post_process
+
 from .base_trainer import BaseTrainer
 
 
