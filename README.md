@@ -1,4 +1,4 @@
-# FairMOT
+# FairMOT BrainlessDylan's Fork
 A simple baseline for one-shot multi-object tracking:
 ![](assets/pipeline.png)
 > [**A Simple Baseline for Multi-Object Tracking**](http://arxiv.org/abs/2004.01888),            
@@ -23,10 +23,12 @@ There has been remarkable progress on object detection and re-identification in 
 <img src="assets/MOT17.gif" width="400"/>   <img src="assets/MOT20.gif" width="400"/>
 
 
-## Installation
+## Installation ( Only Tested on Arch Linux ) 
 * Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
 * Install dependencies. We use python 3.7 and pytorch >= 1.2.0
+* chmod +x ./update to be able to run the updater if it doesn't work OOTB
 ```
+./update to check of there is any updates that have happened to the repo
 conda create -n FairMOT
 conda activate FairMOT
 conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
@@ -53,7 +55,7 @@ MOT20
    |——————images
    |        └——————train
    |        └——————test
-   └——————labels_with_ids
+   └——————labels_with_idsCitation
             └——————train(empty)
 ```
 Then, you can change the seq_root and label_root in src/gen_labels_15.py and src/gen_labels_20.py and run:
@@ -149,7 +151,7 @@ A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https:
 ```
 @article{zhang2020simple,
   title={A Simple Baseline for Multi-Object Tracking},
-  author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu},
+  author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu, Dylan Roberts},
   journal={arXiv preprint arXiv:2004.01888},
   year={2020}
 }
