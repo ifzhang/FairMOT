@@ -137,7 +137,7 @@ You can change --input-video and --output-root to get the demos of your own vide
 If you have difficulty building DCNv2 and thus cannot use the DLA-34 baseline model, you can run the demo with the HRNetV2_w18 baseline model: 
 ```
 cd src
-python demo.py mot --load_model ../models/all_hrnet_v2_w18.pth --arch hrnet_w18 --reid_dim 128 --conf_thres 0.4
+python demo.py mot --load_model ../models/all_hrnet_v2_w18.pth --arch hrnet_18 --reid_dim 128 --conf_thres 0.4
 ```
 --conf_thres can be set from 0.3 to 0.7 depending on your own videos.
 
