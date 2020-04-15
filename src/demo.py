@@ -10,7 +10,7 @@ import os.path as osp
 from opts import opts
 from tracking_utils.utils import mkdir_if_missing
 from tracking_utils.log import logger
-import datasets.dataset.jde as datasets
+import lib.datasets.dataset.jde as datasets
 from track import eval_seq
 
 
@@ -28,16 +28,10 @@ def demo(opt):
 
     frame_dir = None if opt.output_format == 'text' else osp.join(result_root, 'frame')
     try:
-        eval_seq(opt, dataloader, 'mot', result_filename,
-                 save_dir=frame_dir, show_image=False, frame_rate=frame_rate)
+        eval_seq(opt, dataloader, 'mot', result_filename, result_root,
+                show_image=False, frame_rate=frame_rate)
     except Exception as e:
         logger.info(e)
-
-    if opt.output_format == 'video':
-        output_video_path = osp.join(result_root, 'result.mp4')
-        cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}'.format(osp.join(result_root, 'frame'), output_video_path)
-        os.system(cmd_str)
-
 
 if __name__ == '__main__':
     opt = opts().init()
