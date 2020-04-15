@@ -11,3 +11,4 @@ lap
 openpyxl
 Pillow==6.2.2
 tensorboardX
+ffmpy
