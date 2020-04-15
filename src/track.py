@@ -16,13 +16,13 @@ from tracking_utils import visualization as vis
 from tracking_utils.log import logger
 from tracking_utils.timer import Timer
 from tracking_utils.evaluation import Evaluator
-import lib.datasets.dataset.jde as datasets
+import datasets.dataset.jde as datasets
 
 from tracking_utils.utils import mkdir_if_missing
 from opts import opts
 
 from multiprocessing import Queue
-from multiprocessing import Value, Array
+from multiprocessing import Value
 from multiprocessing import Process
 from ffmpy import FFmpeg
 
@@ -109,7 +109,8 @@ def eval_seq(opt, dataloader, data_type, result_filename, result_root, show_imag
                 (H, W) = online_im.shape[:2]
             frameQueue = Queue()
             writerProcess = Process(target=write_video, args=(
-                result_root.replace(".mp4",".avi"), writeVideo, frameQueue, W, H, frame_rate))
+                                    result_root.replace(".mp4",".avi"), writeVideo, 
+                                    frameQueue, W, H, frame_rate))
             writerProcess.start()
         
         if writerProcess is not None:
@@ -120,7 +121,8 @@ def eval_seq(opt, dataloader, data_type, result_filename, result_root, show_imag
     if writerProcess is not None:
         writeVideo.value = 0
         writerProcess.join()
-        ff = FFmpeg(inputs={result_root.replace(".mp4",".avi"): None}, outputs={result_root: '-vcodec h264 -acodec mp2'})
+        ff = FFmpeg(inputs={result_root.replace(".mp4",".avi"): None}, 
+                    outputs={result_root: '-vcodec h264 -acodec mp2'})
         ff.run()
         os.remove(result_root.replace(".mp4",".avi"))
     return frame_id, timer.average_time, timer.calls
