@@ -2,24 +2,19 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _init_paths
-import argparse
-import torch
 import json
-import time
 import os
-import cv2
+import time
 
-from sklearn import metrics
-from scipy import interpolate
 import numpy as np
-from torchvision.transforms import transforms as T
-from models.model import create_model, load_model
+import torch
 from datasets.dataset.jde import DetDataset, collate_fn
-from utils.utils import xywh2xyxy, ap_per_class, bbox_iou
-from opts import opts
 from models.decode import mot_decode
+from models.model import create_model, load_model
+from opts import opts
+from torchvision.transforms import transforms as T
 from utils.post_process import ctdet_post_process
+from utils.utils import xywh2xyxy, ap_per_class, bbox_iou
 
 
 def post_process(opt, dets, meta):
@@ -207,6 +202,7 @@ def test_det(
 
     # Return mAP
     return mean_mAP, mean_R, mean_P
+
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'

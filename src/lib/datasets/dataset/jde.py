@@ -7,16 +7,10 @@ import time
 from collections import OrderedDict
 
 import cv2
-import json
 import numpy as np
 import torch
-
-from torch.utils.data import Dataset
-from torchvision.transforms import transforms as T
-from cython_bbox import bbox_overlaps as bbox_ious
-from opts import opts
 from utils.image import gaussian_radius, draw_umich_gaussian, draw_msra_gaussian
-from utils.utils import xyxy2xywh, generate_anchors, xywh2xyxy, encode_delta
+from utils.utils import xyxy2xywh
 
 
 class LoadImages:  # for inference
@@ -535,5 +529,3 @@ class DetDataset(LoadImagesAndLabels):  # for training
                 labels[i, 1] += self.tid_start_index[ds]
 
         return imgs, labels0, img_path, (h, w)
-
-
