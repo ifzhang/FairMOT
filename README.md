@@ -103,7 +103,7 @@ sh experiments/all_dla34.sh
 cd src
 python track.py mot --load_model ../models/all_dla34.pth --conf_thres 0.6
 ```
-to see the tracking results. You can also set save_images=True in src/track.py to save the visualization results of each frame. 
+to see the tracking results (76.1 MOTA using the baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
 
 * To get the txt results of the test set of MOT16 or MOT17, you can run:
 ```
