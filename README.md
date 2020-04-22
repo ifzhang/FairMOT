@@ -79,7 +79,7 @@ ${FAIRMOT_ROOT}
 ```
 * **Baseline model**
 
-Our baseline FairMOT model can be downloaded here: DLA-34: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA). HRNetV2_W18: [[Google]](https://drive.google.com/open?id=1hxqE5QuzGCa6sgyBvNYhywmyohmioVAO) [[Baidu, code: 7jb1]](https://pan.baidu.com/s/1yQxXh0FuPLoFfeupHGZlCw).
+Our baseline FairMOT model can be downloaded here: DLA-34: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA). HRNetV2_W18: [[Google]](https://drive.google.com/open?id=1Hna9jmA1jac42u8e9v6HXSS5aldV41YY) [[Baidu, code: z4ft]](https://pan.baidu.com/s/1h1qwn8dyJmKj_nZi5H3NAQ).
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
@@ -98,12 +98,19 @@ sh experiments/all_dla34.sh
 ```
 
 ## Tracking
-* The default settings run tracking on the validation dataset from 2DMOT15. You can run:
+* The default settings run tracking on the validation dataset from 2DMOT15. Using the DLA-34 baseline model, you can run:
 ```
 cd src
 python track.py mot --load_model ../models/all_dla34.pth --conf_thres 0.6
 ```
-to see the tracking results (76.1 MOTA using the baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
+to see the tracking results (76.1 MOTA using the DLA-34 baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
+
+Using the HRNetV2-W18 baseline model, you can run:
+```
+cd src
+python track.py mot --load_model ../models/all_hrnet_v2_w18.pth --conf_thres 0.6 --arch hrnet_18 --reid_dim 128
+```
+to see the tracking results (76.6 MOTA using the HRNetV2-W18 baseline model).
 
 * To get the txt results of the test set of MOT16 or MOT17, you can run:
 ```
