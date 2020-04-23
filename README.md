@@ -129,9 +129,12 @@ and then run the tracking code:
 ```
 cd src
 python track.py mot --test_mot15 True --load_model your_mot15_model.pth --conf_thres 0.3
-python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3
+python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3 --K 500
 ```
-Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20.
+Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20. You can also use the SOTA MOT20 pretrained model here [[Google]](https://drive.google.com/open?id=1GInbQoCtp1KHVrhzEof77Wt07fvwHcXb):
+```
+python track.py mot --test_mot20 True --load_model ../models/mot20_dla34.pth --reid_dim 128 --conf_thres 0.3 --K 500
+```
 
 ## Demo
 You can input a raw video and get the demo video by running src/demo.py and get the mp4 format of the demo video:
