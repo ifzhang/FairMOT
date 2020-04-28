@@ -118,7 +118,7 @@ cd src
 python track.py mot --test_mot17 True --load_model ../models/all_dla34.pth --conf_thres 0.4
 python track.py mot --test_mot16 True --load_model ../models/all_dla34.pth --conf_thres 0.4
 ```
-and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results.
+and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 67.5 MOTA on MOT17 test set using the baseline model 'all_dla34.pth'.)
 
 * To get the SOTA results of 2DMOT15 and MOT20, you need to finetune the baseline model on the specific dataset because our training set do not contain them. You can run:
 ```
@@ -135,6 +135,7 @@ Results of the test set all need to be evaluated on the MOT challenge server. Yo
 ```
 python track.py mot --test_mot20 True --load_model ../models/mot20_dla34.pth --reid_dim 128 --conf_thres 0.3 --K 500
 ```
+After evaluating on MOT challenge server, you can get 58.7 MOTA on MOT20 test set using the model 'mot20_dla34.pth'.
 
 ## Demo
 You can input a raw video and get the demo video by running src/demo.py and get the mp4 format of the demo video:
