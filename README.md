@@ -32,7 +32,7 @@ conda activate FairMOT
 conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
 cd ${FAIRMOT_ROOT}
 pip install -r requirements.txt
-cd src/lib/models/networks/DCNv2 sh make.sh
+cd src/lib/models/networks/DCNv2 && sh make.sh
 ```
 * We use [DCNv2](https://github.com/CharlesShang/DCNv2) in our backbone network and more details can be found in their repo. 
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
@@ -53,7 +53,7 @@ MOT20
    |——————images
    |        └——————train
    |        └——————test
-   └——————labels_with_ids
+   └——————labels_with_idsCitation
             └——————train(empty)
 ```
 Then, you can change the seq_root and label_root in src/gen_labels_15.py and src/gen_labels_20.py and run:
