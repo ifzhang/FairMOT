@@ -32,7 +32,7 @@ conda activate FairMOT
 conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
 cd ${FAIRMOT_ROOT}
 pip install -r requirements.txt
-cd src/lib/models/networks/DCNv2 sh make.sh
+cd src/lib/models/networks/DCNv2_new sh make.sh
 ```
 * We use [DCNv2](https://github.com/CharlesShang/DCNv2) in our backbone network and more details can be found in their repo. 
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
@@ -79,7 +79,7 @@ ${FAIRMOT_ROOT}
 ```
 * **Baseline model**
 
-Our baseline FairMOT model can be downloaded here: DLA-34: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA). HRNetV2_W18: [[Google]](https://drive.google.com/open?id=1hxqE5QuzGCa6sgyBvNYhywmyohmioVAO) [[Baidu, code: 7jb1]](https://pan.baidu.com/s/1yQxXh0FuPLoFfeupHGZlCw).
+Our baseline FairMOT model can be downloaded here: DLA-34: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA). HRNetV2_W18: [[Google]](https://drive.google.com/open?id=182EHCOSzVVopvAqAXN5o6XHX4PEyLjZT) [[Baidu, code: z4ft]](https://pan.baidu.com/s/1h1qwn8dyJmKj_nZi5H3NAQ).
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
@@ -98,12 +98,19 @@ sh experiments/all_dla34.sh
 ```
 
 ## Tracking
-* The default settings run tracking on the validation dataset from 2DMOT15. You can run:
+* The default settings run tracking on the validation dataset from 2DMOT15. Using the DLA-34 baseline model, you can run:
 ```
 cd src
 python track.py mot --load_model ../models/all_dla34.pth --conf_thres 0.6
 ```
-to see the tracking results. You can also set save_images=True in src/track.py to save the visualization results of each frame. 
+to see the tracking results (76.1 MOTA using the DLA-34 baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
+
+Using the HRNetV2-W18 baseline model, you can run:
+```
+cd src
+python track.py mot --load_model ../models/all_hrnet_v2_w18.pth --conf_thres 0.6 --arch hrnet_18 --reid_dim 128
+```
+to see the tracking results (76.6 MOTA using the HRNetV2-W18 baseline model).
 
 * To get the txt results of the test set of MOT16 or MOT17, you can run:
 ```
@@ -111,7 +118,7 @@ cd src
 python track.py mot --test_mot17 True --load_model ../models/all_dla34.pth --conf_thres 0.4
 python track.py mot --test_mot16 True --load_model ../models/all_dla34.pth --conf_thres 0.4
 ```
-and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results.
+and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 67.5 MOTA on MOT17 test set using the baseline model 'all_dla34.pth'.)
 
 * To get the SOTA results of 2DMOT15 and MOT20, you need to finetune the baseline model on the specific dataset because our training set do not contain them. You can run:
 ```
@@ -122,9 +129,13 @@ and then run the tracking code:
 ```
 cd src
 python track.py mot --test_mot15 True --load_model your_mot15_model.pth --conf_thres 0.3
-python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3
+python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3 --K 500
 ```
-Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20.
+Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20. You can also use the SOTA MOT20 pretrained model here [[Google]](https://drive.google.com/open?id=1GInbQoCtp1KHVrhzEof77Wt07fvwHcXb), [[Baidu],code:mqnz](https://pan.baidu.com/s/1c0reh3XDnbeoPZ4zFIvzGg):
+```
+python track.py mot --test_mot20 True --load_model ../models/mot20_dla34.pth --reid_dim 128 --conf_thres 0.3 --K 500
+```
+After evaluating on MOT challenge server, you can get 58.7 MOTA on MOT20 test set using the model 'mot20_dla34.pth'.
 
 ## Demo
 You can input a raw video and get the demo video by running src/demo.py and get the mp4 format of the demo video:
@@ -134,7 +145,7 @@ python demo.py mot --load_model ../models/all_dla34.pth --conf_thres 0.4
 ```
 You can change --input-video and --output-root to get the demos of your own videos.
 
-If you have difficulty building DCNv2 and thus cannot use the DLA-34 baseline model, you can run the demo with the HRNetV2_w18 baseline model: 
+If you have difficulty building DCNv2 and thus cannot use the DLA-34 baseline model, you can run the demo with the HRNetV2_w18 baseline model (don't forget to comment lines with 'dcn' in src/libs/models/model.py if you do not build DCNv2): 
 ```
 cd src
 python demo.py mot --load_model ../models/all_hrnet_v2_w18.pth --arch hrnet_18 --reid_dim 128 --conf_thres 0.4
