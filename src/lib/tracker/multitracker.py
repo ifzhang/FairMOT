@@ -185,7 +185,7 @@ class JDETracker(object):
         self.det_thresh = opt.conf_thres
         self.buffer_size = int(frame_rate / 30.0 * opt.track_buffer)
         self.max_time_lost = self.buffer_size
-        self.max_per_image = 128
+        self.max_per_image = opt.K
         self.mean = np.array(opt.mean, dtype=np.float32).reshape(1, 1, 3)
         self.std = np.array(opt.std, dtype=np.float32).reshape(1, 1, 3)
 
