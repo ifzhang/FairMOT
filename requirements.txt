@@ -9,5 +9,5 @@ numba
 matplotlib
 lap
 openpyxl
-Pillow==6.2.2
+Pillow
 tensorboardX
