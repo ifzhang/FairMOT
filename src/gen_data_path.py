@@ -1,6 +1,5 @@
-import os
 import glob
-import _init_paths
+import os
 
 
 def gen_caltech_path(root_path):

@@ -2,7 +2,6 @@
 
 import os
 import glob
-
 import torch
 
 from torch.utils.cpp_extension import CUDA_HOME
@@ -13,6 +12,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 requirements = ["torch", "torchvision"]
+
 
 def get_extensions():
     this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -52,6 +52,7 @@ def get_extensions():
         )
     ]
     return ext_modules
+
 
 setup(
     name="DCNv2",
