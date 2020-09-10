@@ -11,7 +11,6 @@ import argparse
 import motmetrics as mm
 import numpy as np
 import torch
-
 from tracker.multitracker import JDETracker
 from tracking_utils import visualization as vis
 from tracking_utils.log import logger
@@ -22,6 +21,10 @@ import datasets.dataset.jde as datasets
 from tracking_utils.utils import mkdir_if_missing
 from opts import opts
 
+from multiprocessing import Queue
+from multiprocessing import Value
+from multiprocessing import Process
+from ffmpy import FFmpeg
 
 def write_results(filename, results, data_type):
     if data_type == 'mot':
@@ -44,14 +47,35 @@ def write_results(filename, results, data_type):
                 f.write(line)
     logger.info('save results to {}'.format(filename))
 
+def write_video(outputPath, writeVideo, frameQueue, W, H, frame_rate):
+    	
+    # initialize the FourCC and video writer object
+    fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+    writer = cv2.VideoWriter(outputPath, fourcc, frame_rate,
+      (W, H), True)
 
-def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_image=True, frame_rate=30):
-    if save_dir:
-        mkdir_if_missing(save_dir)
+    # loop while the write flag is set or the output frame queue is
+    # not empty
+    while writeVideo.value or not frameQueue.empty():
+      # check if the output frame queue is not empty
+      if not frameQueue.empty():
+        # get the frame from the queue and write the frame
+        frame = frameQueue.get()
+        writer.write(frame)            
+
+    # release the video writer object
+    writer.release()
+
+def eval_seq(opt, dataloader, data_type, result_filename, result_root, show_image=True, frame_rate=30):
+    output_video_path = "result.mp4"
+    result_root = os.path.join(result_root, output_video_path)
     tracker = JDETracker(opt, frame_rate=frame_rate)
     timer = Timer()
     results = []
     frame_id = 0
+    writerProcess = None
+    W = None
+    H = None
     for path, img, img0 in dataloader:
         if frame_id % 20 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
@@ -72,16 +96,35 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
         timer.toc()
         # save results
         results.append((frame_id + 1, online_tlwhs, online_ids))
-        if show_image or save_dir is not None:
+        if show_image is not None:
             online_im = vis.plot_tracking(img0, online_tlwhs, online_ids, frame_id=frame_id,
                                           fps=1. / timer.average_time)
         if show_image:
             cv2.imshow('online_im', online_im)
-        if save_dir is not None:
-            cv2.imwrite(os.path.join(save_dir, '{:05d}.jpg'.format(frame_id)), online_im)
-        frame_id += 1
+        
+        # A neat trick I learned from PyImageSearch.com / Adrian Rosebrock's book 
+        if writerProcess is None:
+            writeVideo = Value('i', 1)
+            if W is None or H is None:
+                (H, W) = online_im.shape[:2]
+            frameQueue = Queue()
+            writerProcess = Process(target=write_video, args=(
+                                    result_root.replace(".mp4",".avi"), writeVideo, 
+                                    frameQueue, W, H, frame_rate))
+            writerProcess.start()
+        
+        if writerProcess is not None:
+            frameQueue.put(online_im)
+    frame_id += 1
     # save results
     write_results(result_filename, results, data_type)
+    if writerProcess is not None:
+        writeVideo.value = 0
+        writerProcess.join()
+        ff = FFmpeg(inputs={result_root.replace(".mp4",".avi"): None}, 
+                    outputs={result_root: '-vcodec h264 -acodec mp2'})
+        ff.run()
+        os.remove(result_root.replace(".mp4",".avi"))
     return frame_id, timer.average_time, timer.calls
 
 
