@@ -45,6 +45,28 @@ def write_results(filename, results, data_type):
     logger.info('save results to {}'.format(filename))
 
 
+def write_results_score(filename, results, data_type):
+    if data_type == 'mot':
+        save_format = '{frame},{id},{x1},{y1},{w},{h},{s},1,-1,-1,-1\n'
+    elif data_type == 'kitti':
+        save_format = '{frame} {id} pedestrian 0 0 -10 {x1} {y1} {x2} {y2} -10 -10 -10 -1000 -1000 -1000 -10\n'
+    else:
+        raise ValueError(data_type)
+
+    with open(filename, 'w') as f:
+        for frame_id, tlwhs, track_ids, scores in results:
+            if data_type == 'kitti':
+                frame_id -= 1
+            for tlwh, track_id, score in zip(tlwhs, track_ids, scores):
+                if track_id < 0:
+                    continue
+                x1, y1, w, h = tlwh
+                x2, y2 = x1 + w, y1 + h
+                line = save_format.format(frame=frame_id, id=track_id, x1=x1, y1=y1, x2=x2, y2=y2, w=w, h=h, s=score)
+                f.write(line)
+    logger.info('save results to {}'.format(filename))
+
+
 def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_image=True, frame_rate=30):
     if save_dir:
         mkdir_if_missing(save_dir)
@@ -52,7 +74,10 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
     timer = Timer()
     results = []
     frame_id = 0
-    for path, img, img0 in dataloader:
+    #for path, img, img0 in dataloader:
+    for i, (path, img, img0) in enumerate(dataloader):
+        #if i % 8 != 0:
+            #continue
         if frame_id % 20 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1. / max(1e-5, timer.average_time)))
 
@@ -62,6 +87,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
         online_targets = tracker.update(blob, img0)
         online_tlwhs = []
         online_ids = []
+        #online_scores = []
         for t in online_targets:
             tlwh = t.tlwh
             tid = t.track_id
@@ -69,9 +95,11 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
             if tlwh[2] * tlwh[3] > opt.min_box_area and not vertical:
                 online_tlwhs.append(tlwh)
                 online_ids.append(tid)
+                #online_scores.append(t.score)
         timer.toc()
         # save results
         results.append((frame_id + 1, online_tlwhs, online_ids))
+        #results.append((frame_id + 1, online_tlwhs, online_ids, online_scores))
         if show_image or save_dir is not None:
             online_im = vis.plot_tracking(img0, online_tlwhs, online_ids, frame_id=frame_id,
                                           fps=1. / timer.average_time)
@@ -82,6 +110,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
         frame_id += 1
     # save results
     write_results(result_filename, results, data_type)
+    #write_results_score(result_filename, results, data_type)
     return frame_id, timer.average_time, timer.calls
 
 
@@ -137,7 +166,7 @@ def main(opt, data_root='/data/MOT16/train', det_root=None, seqs=('MOT16-05',), 
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     opt = opts().init()
 
     if not opt.val_mot16:
@@ -147,6 +176,7 @@ if __name__ == '__main__':
                       PETS09-S2L1
                       TUD-Campus
                       TUD-Stadtmitte'''
+        #seqs_str = '''TUD-Campus'''
         data_root = os.path.join(opt.data_dir, 'MOT15/images/train')
     else:
         seqs_str = '''MOT16-02
@@ -165,6 +195,8 @@ if __name__ == '__main__':
                       MOT16-08
                       MOT16-12
                       MOT16-14'''
+        #seqs_str = '''MOT16-01 MOT16-07 MOT16-12 MOT16-14'''
+        #seqs_str = '''MOT16-06 MOT16-08'''
         data_root = os.path.join(opt.data_dir, 'MOT16/test')
     if opt.test_mot15:
         seqs_str = '''ADL-Rundle-1
@@ -187,6 +219,14 @@ if __name__ == '__main__':
                       MOT17-08-SDP
                       MOT17-12-SDP
                       MOT17-14-SDP'''
+        #seqs_str = '''MOT17-01-SDP
+                      #MOT17-06-SDP
+                      #MOT17-07-SDP
+                      #MOT17-12-SDP
+                      #'''
+        #seqs_str = '''MOT17-01-SDP MOT17-07-SDP MOT17-12-SDP MOT17-14-SDP'''
+        #seqs_str = '''MOT17-03-SDP'''
+        #seqs_str = '''MOT17-06-SDP MOT17-08-SDP'''
         data_root = os.path.join(opt.data_dir, 'MOT17/images/test')
     if opt.val_mot17:
         seqs_str = '''MOT17-02-SDP
@@ -196,9 +236,11 @@ if __name__ == '__main__':
                       MOT17-10-SDP
                       MOT17-11-SDP
                       MOT17-13-SDP'''
+        #seqs_str = '''MOT17-02-SDP'''
         data_root = os.path.join(opt.data_dir, 'MOT17/images/train')
     if opt.val_mot15:
-        seqs_str = '''KITTI-13
+        seqs_str = '''Venice-2
+                      KITTI-13
                       KITTI-17
                       ETH-Bahnhof
                       ETH-Sunnyday
@@ -209,6 +251,7 @@ if __name__ == '__main__':
                       ADL-Rundle-8
                       ETH-Pedcross2
                       TUD-Stadtmitte'''
+        #seqs_str = '''Venice-2'''
         data_root = os.path.join(opt.data_dir, 'MOT15/images/train')
     if opt.val_mot20:
         seqs_str = '''MOT20-01
@@ -229,7 +272,7 @@ if __name__ == '__main__':
     main(opt,
          data_root=data_root,
          seqs=seqs,
-         exp_name='MOT15_val_all_dla34',
+         exp_name='MOT17_test_public_dla34',
          show_image=False,
          save_images=False,
          save_videos=False)

@@ -1,19 +1,25 @@
-from collections import deque
-
 import numpy as np
+from numba import jit
+from collections import deque
+import itertools
+import os
+import os.path as osp
+import time
 import torch
+import cv2
 import torch.nn.functional as F
-from models import *
-from models.decode import mot_decode
-from models.model import create_model, load_model
-from models.utils import _tranpose_and_gather_feat
-from tracker import matching
-from tracking_utils.kalman_filter import KalmanFilter
-from tracking_utils.log import logger
-from tracking_utils.utils import *
-from utils.post_process import ctdet_post_process
 
+from models.model import create_model, load_model
+from models.decode import mot_decode
+from tracking_utils.utils import *
+from tracking_utils.log import logger
+from tracking_utils.kalman_filter import KalmanFilter
+from models import *
+from tracker import matching
 from .basetrack import BaseTrack, TrackState
+from utils.post_process import ctdet_post_process
+from utils.image import get_affine_transform
+from models.utils import _tranpose_and_gather_feat
 
 
 class STrack(BaseTrack):
@@ -245,7 +251,7 @@ class JDETracker(object):
             id_feature = F.normalize(id_feature, dim=1)
 
             reg = output['reg'] if self.opt.reg_offset else None
-            dets, inds = mot_decode(hm, wh, reg=reg, cat_spec_wh=self.opt.cat_spec_wh, K=self.opt.K)
+            dets, inds = mot_decode(hm, wh, reg=reg, ltrb=self.opt.ltrb, K=self.opt.K)
             id_feature = _tranpose_and_gather_feat(id_feature, inds)
             id_feature = id_feature.squeeze(0)
             id_feature = id_feature.cpu().numpy()
@@ -292,9 +298,9 @@ class JDETracker(object):
             #strack.predict()
         STrack.multi_predict(strack_pool)
         dists = matching.embedding_distance(strack_pool, detections)
-        #dists = matching.gate_cost_matrix(self.kalman_filter, dists, strack_pool, detections)
+        #dists = matching.iou_distance(strack_pool, detections)
         dists = matching.fuse_motion(self.kalman_filter, dists, strack_pool, detections)
-        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.7)
+        matches, u_track, u_detection = matching.linear_assignment(dists, thresh=0.4)
 
         for itracked, idet in matches:
             track = strack_pool[itracked]
@@ -321,7 +327,7 @@ class JDETracker(object):
             else:
                 track.re_activate(det, self.frame_id, new_id=False)
                 refind_stracks.append(track)
-
+                
         for it in u_track:
             track = r_tracked_stracks[it]
             if not track.state == TrackState.Lost:

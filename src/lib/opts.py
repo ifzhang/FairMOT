@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import argparse
 import os
-
+import sys
 
 class opts(object):
   def __init__(self):
@@ -50,7 +50,7 @@ class opts(object):
     self.parser.add_argument('--arch', default='dla_34', 
                              help='model architecture. Currently tested'
                                   'resdcn_34 | resdcn_50 | resfpndcn_34 |'
-                                  'dla_34 | hrnet_32')
+                                  'dla_34 | hrnet_18')
     self.parser.add_argument('--head_conv', type=int, default=-1,
                              help='conv layer channels for output head'
                                   '0 for no conv layer'
@@ -70,8 +70,8 @@ class opts(object):
     
     # train
     self.parser.add_argument('--lr', type=float, default=1e-4,
-                             help='learning rate for batch size 32.')
-    self.parser.add_argument('--lr_step', type=str, default='20,27',
+                             help='learning rate for batch size 12.')
+    self.parser.add_argument('--lr_step', type=str, default='20',
                              help='drop learning rate by 10.')
     self.parser.add_argument('--num_epochs', type=int, default=30,
                              help='total training epochs.')
@@ -88,7 +88,7 @@ class opts(object):
                                   'test on test set')
 
     # test
-    self.parser.add_argument('--K', type=int, default=128,
+    self.parser.add_argument('--K', type=int, default=500,
                              help='max number of output objects.') 
     self.parser.add_argument('--not_prefetch_test', action='store_true',
                              help='not use parallal data pre-processing.')
@@ -104,23 +104,27 @@ class opts(object):
     self.parser.add_argument('--test_mot15', default=False, help='test mot15')
     self.parser.add_argument('--val_mot16', default=False, help='val mot16 or mot15')
     self.parser.add_argument('--test_mot17', default=False, help='test mot17')
-    self.parser.add_argument('--val_mot17', default=False, help='val mot17')
+    self.parser.add_argument('--val_mot17', default=True, help='val mot17')
     self.parser.add_argument('--val_mot20', default=False, help='val mot20')
     self.parser.add_argument('--test_mot20', default=False, help='test mot20')
-    self.parser.add_argument('--conf_thres', type=float, default=0.6, help='confidence thresh for tracking')
+    self.parser.add_argument('--val_hie', default=False, help='val hie')
+    self.parser.add_argument('--test_hie', default=False, help='test hie')
+    self.parser.add_argument('--conf_thres', type=float, default=0.4, help='confidence thresh for tracking')
     self.parser.add_argument('--det_thres', type=float, default=0.3, help='confidence thresh for detection')
     self.parser.add_argument('--nms_thres', type=float, default=0.4, help='iou thresh for nms')
     self.parser.add_argument('--track_buffer', type=int, default=30, help='tracking buffer')
-    self.parser.add_argument('--min-box-area', type=float, default=200, help='filter out tiny boxes')
-    self.parser.add_argument('--input-video', type=str, default='../videos/MOT16-03.mp4', help='path to the input video')
+    self.parser.add_argument('--min-box-area', type=float, default=100, help='filter out tiny boxes')
+    self.parser.add_argument('--input-video', type=str,
+                             default='../videos/MOT16-03.mp4',
+                             help='path to the input video')
     self.parser.add_argument('--output-format', type=str, default='video', help='video or text')
-    self.parser.add_argument('--output-root', type=str, default='../results', help='expected output root path')
+    self.parser.add_argument('--output-root', type=str, default='../demos', help='expected output root path')
 
     # mot
     self.parser.add_argument('--data_cfg', type=str,
                              default='../src/lib/cfg/data.json',
                              help='load data from cfg')
-    self.parser.add_argument('--data_dir', type=str, default='./data')
+    self.parser.add_argument('--data_dir', type=str, default='/data/yfzhang/MOT/JDE')
 
     # loss
     self.parser.add_argument('--mse_loss', action='store_true',
@@ -139,8 +143,10 @@ class opts(object):
                              help='reid loss: ce | triplet')
     self.parser.add_argument('--id_weight', type=float, default=1,
                              help='loss weight for id')
-    self.parser.add_argument('--reid_dim', type=int, default=512,
+    self.parser.add_argument('--reid_dim', type=int, default=128,
                              help='feature dim for reid')
+    self.parser.add_argument('--ltrb', default=True,
+                             help='regress left, top, right, bottom of bbox')
 
     self.parser.add_argument('--norm_wh', action='store_true',
                              help='L1(\hat(y) / y, 1) or L1(\hat(y), y)')
@@ -215,12 +221,14 @@ class opts(object):
 
     if opt.task == 'mot':
       opt.heads = {'hm': opt.num_classes,
-                   'wh': 2 if not opt.cat_spec_wh else 2 * opt.num_classes,
+                   'wh': 2 if not opt.ltrb else 4,
                    'id': opt.reid_dim}
       if opt.reg_offset:
         opt.heads.update({'reg': 2})
       opt.nID = dataset.nID
       opt.img_size = (1088, 608)
+      #opt.img_size = (864, 480)
+      #opt.img_size = (576, 320)
     else:
       assert 0, 'task not defined!'
     print('heads', opt.heads)

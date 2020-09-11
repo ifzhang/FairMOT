@@ -1,7 +1,8 @@
 import glob
+import random
+import time
 import os
 import os.path as osp
-import random
 
 import cv2
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ import torch
 import torch.nn.functional as F
 from torchvision.ops import nms
 
-# import maskrcnn_benchmark.layers.nms as nms
+#import maskrcnn_benchmark.layers.nms as nms
 # Set printoptions
 torch.set_printoptions(linewidth=1320, precision=5, profile='long')
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})  # format short g, %precision=5

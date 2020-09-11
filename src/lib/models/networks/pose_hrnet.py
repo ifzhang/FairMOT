@@ -339,21 +339,21 @@ class PoseHighResolutionNet(nn.Module):
 
         last_inp_channels = np.int(np.sum(pre_stage_channels))
 
-        self.last_layer = nn.Sequential(
-            nn.Conv2d(
-                in_channels=last_inp_channels,
-                out_channels=64,
-                kernel_size=1,
-                stride=1,
-                padding=0),
-            nn.BatchNorm2d(64, momentum=BN_MOMENTUM),
-            nn.ReLU(inplace=True),
-        )
+        #self.last_layer = nn.Sequential(
+            #nn.Conv2d(
+                #in_channels=last_inp_channels,
+                #out_channels=64,
+                #kernel_size=1,
+                #stride=1,
+                #padding=0),
+            #nn.BatchNorm2d(64, momentum=BN_MOMENTUM),
+            #nn.ReLU(inplace=True),
+        #)
         head_conv = 256
         for head in self.heads:
             classes = self.heads[head]
             fc = nn.Sequential(
-                nn.Conv2d(64, head_conv,
+                nn.Conv2d(last_inp_channels, head_conv,
                           kernel_size=3, padding=1, bias=True),
                 nn.ReLU(inplace=True),
                 nn.Conv2d(head_conv, classes,
@@ -506,8 +506,6 @@ class PoseHighResolutionNet(nn.Module):
 
         x = torch.cat([x[0], x1, x2, x3], 1)
 
-        x = self.last_layer(x)
-
         z = {}
         for head in self.heads:
             z[head] = self.__getattr__(head)(x)
@@ -517,11 +515,12 @@ class PoseHighResolutionNet(nn.Module):
         if os.path.isfile(pretrained):
             pretrained_state_dict = torch.load(pretrained)
             logger.info('=> loading pretrained model {}'.format(pretrained))
+            print('=> loading pretrained model {}'.format(pretrained))
 
             need_init_state_dict = {}
             for name, m in pretrained_state_dict.items():
                 if name.split('.')[0] in self.pretrained_layers \
-                   or self.pretrained_layers[0] == '*':
+                   or self.pretrained_layers[0] is '*':
                     need_init_state_dict[name] = m
             self.load_state_dict(need_init_state_dict, strict=False)
         elif pretrained:

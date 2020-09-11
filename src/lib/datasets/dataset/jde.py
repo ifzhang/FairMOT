@@ -10,6 +10,7 @@ import cv2
 import json
 import numpy as np
 import torch
+import copy
 
 from torch.utils.data import Dataset
 from torchvision.transforms import transforms as T
@@ -206,7 +207,7 @@ class LoadImagesAndLabels:  # for training
             import matplotlib.pyplot as plt
             plt.figure(figsize=(50, 50))
             plt.imshow(img[:, :, ::-1])
-            plt.plot(labels[:, [2, 4, 4, 2, 2]].T, labels[:, [3, 3, 5, 5, 3]].T, '.-')
+            plt.plot(labels[:, [1, 3, 3, 1, 1]].T, labels[:, [2, 2, 4, 4, 2]].T, '.-')
             plt.axis('off')
             plt.savefig('test.jpg')
             time.sleep(10)
@@ -309,10 +310,10 @@ def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scal
             xy = np.concatenate((x - w / 2, y - h / 2, x + w / 2, y + h / 2)).reshape(4, n).T
 
             # reject warped points outside of image
-            np.clip(xy[:, 0], 0, width, out=xy[:, 0])
-            np.clip(xy[:, 2], 0, width, out=xy[:, 2])
-            np.clip(xy[:, 1], 0, height, out=xy[:, 1])
-            np.clip(xy[:, 3], 0, height, out=xy[:, 3])
+            #np.clip(xy[:, 0], 0, width, out=xy[:, 0])
+            #np.clip(xy[:, 2], 0, width, out=xy[:, 2])
+            #np.clip(xy[:, 1], 0, height, out=xy[:, 1])
+            #np.clip(xy[:, 3], 0, height, out=xy[:, 3])
             w = xy[:, 2] - xy[:, 0]
             h = xy[:, 3] - xy[:, 1]
             area = w * h
@@ -325,24 +326,6 @@ def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scal
         return imw, targets, M
     else:
         return imw
-
-
-def collate_fn(batch):
-    imgs, labels, paths, sizes = zip(*batch)
-    batch_size = len(labels)
-    imgs = torch.stack(imgs, 0)
-    max_box_len = max([l.shape[0] for l in labels])
-    labels = [torch.from_numpy(l) for l in labels]
-    filled_labels = torch.zeros(batch_size, max_box_len, 6)
-    labels_len = torch.zeros(batch_size)
-
-    for i in range(batch_size):
-        isize = labels[i].shape[0]
-        if len(labels[i]) > 0:
-            filled_labels[i, :isize, :] = labels[i]
-        labels_len[i] = isize
-
-    return imgs, filled_labels, paths, sizes, labels_len.unsqueeze(1)
 
 
 class JointDataset(LoadImagesAndLabels):  # for training
@@ -427,11 +410,15 @@ class JointDataset(LoadImagesAndLabels):  # for training
         num_classes = self.num_classes
         num_objs = labels.shape[0]
         hm = np.zeros((num_classes, output_h, output_w), dtype=np.float32)
-        wh = np.zeros((self.max_objs, 2), dtype=np.float32)
+        if self.opt.ltrb:
+            wh = np.zeros((self.max_objs, 4), dtype=np.float32)
+        else:
+            wh = np.zeros((self.max_objs, 2), dtype=np.float32)
         reg = np.zeros((self.max_objs, 2), dtype=np.float32)
         ind = np.zeros((self.max_objs, ), dtype=np.int64)
         reg_mask = np.zeros((self.max_objs, ), dtype=np.uint8)
         ids = np.zeros((self.max_objs, ), dtype=np.int64)
+        bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
 
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
         for k in range(num_objs):
@@ -440,26 +427,43 @@ class JointDataset(LoadImagesAndLabels):  # for training
             cls_id = int(label[0])
             bbox[[0, 2]] = bbox[[0, 2]] * output_w
             bbox[[1, 3]] = bbox[[1, 3]] * output_h
+            bbox_amodal = copy.deepcopy(bbox)
+            bbox_amodal[0] = bbox_amodal[0] - bbox_amodal[2] / 2.
+            bbox_amodal[1] = bbox_amodal[1] - bbox_amodal[3] / 2.
+            bbox_amodal[2] = bbox_amodal[0] + bbox_amodal[2]
+            bbox_amodal[3] = bbox_amodal[1] + bbox_amodal[3]
             bbox[0] = np.clip(bbox[0], 0, output_w - 1)
             bbox[1] = np.clip(bbox[1], 0, output_h - 1)
             h = bbox[3]
             w = bbox[2]
 
+            bbox_xy = copy.deepcopy(bbox)
+            bbox_xy[0] = bbox_xy[0] - bbox_xy[2] / 2
+            bbox_xy[1] = bbox_xy[1] - bbox_xy[3] / 2
+            bbox_xy[2] = bbox_xy[0] + bbox_xy[2]
+            bbox_xy[3] = bbox_xy[1] + bbox_xy[3]
+
             if h > 0 and w > 0:
                 radius = gaussian_radius((math.ceil(h), math.ceil(w)))
                 radius = max(0, int(radius))
-                radius = self.opt.hm_gauss if self.opt.mse_loss else radius
+                radius = 6 if self.opt.mse_loss else radius
+                #radius = max(1, int(radius)) if self.opt.mse_loss else radius
                 ct = np.array(
                     [bbox[0], bbox[1]], dtype=np.float32)
                 ct_int = ct.astype(np.int32)
                 draw_gaussian(hm[cls_id], ct_int, radius)
-                wh[k] = 1. * w, 1. * h
+                if self.opt.ltrb:
+                    wh[k] = ct[0] - bbox_amodal[0], ct[1] - bbox_amodal[1], \
+                            bbox_amodal[2] - ct[0], bbox_amodal[3] - ct[1]
+                else:
+                    wh[k] = 1. * w, 1. * h
                 ind[k] = ct_int[1] * output_w + ct_int[0]
                 reg[k] = ct - ct_int
                 reg_mask[k] = 1
                 ids[k] = label[1]
+                bbox_xys[k] = bbox_xy
 
-        ret = {'input': imgs, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh, 'reg': reg, 'ids': ids}
+        ret = {'input': imgs, 'hm': hm, 'reg_mask': reg_mask, 'ind': ind, 'wh': wh, 'reg': reg, 'ids': ids, 'bbox': bbox_xys}
         return ret
 
 

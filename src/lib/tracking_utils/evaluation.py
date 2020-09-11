@@ -79,7 +79,8 @@ class Evaluator(object):
         self.reset_accumulator()
 
         result_frame_dict = read_results(filename, self.data_type, is_gt=False)
-        frames = sorted(list(set(self.gt_frame_dict.keys()) | set(result_frame_dict.keys())))
+        #frames = sorted(list(set(self.gt_frame_dict.keys()) | set(result_frame_dict.keys())))
+        frames = sorted(list(set(result_frame_dict.keys())))
         for frame_id in frames:
             trk_objs = result_frame_dict.get(frame_id, [])
             trk_tlwhs, trk_ids = unzip_objs(trk_objs)[:2]

@@ -411,6 +411,12 @@ def dla169(pretrained=None, **kwargs):  # DLA-169
     return model
 
 
+def set_bn(bn):
+    global BatchNorm
+    BatchNorm = bn
+    dla.BatchNorm = bn
+
+
 class Identity(nn.Module):
     def __init__(self):
         super(Identity, self).__init__()

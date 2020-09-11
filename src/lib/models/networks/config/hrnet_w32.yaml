@@ -26,8 +26,6 @@ MODEL:
   INIT_WEIGHTS: true
   NAME: pose_hrnet
   NUM_JOINTS: 17
-  #PRETRAINED: '/home/yfzhang/PycharmProjects/FairMOT/models/pose_hrnet_w32_384x288.pth'
-  #PRETRAINED: '/home/yfzhang/PycharmProjects/FairMOT/models/hrnet_w32-36af842e.pth'
   PRETRAINED: '../models/hrnetv2_w32_imagenet_pretrained.pth'
   TARGET_TYPE: gaussian
   IMAGE_SIZE:

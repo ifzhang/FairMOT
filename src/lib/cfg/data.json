@@ -3,7 +3,7 @@
     "train":
     {
         "mot17":"./data/mot17.train",
-        "caltech":"./data/caltech.train",
+        "caltech":"./data/caltech.all",
         "citypersons":"./data/citypersons.train",
         "cuhksysu":"./data/cuhksysu.train",
         "prw":"./data/prw.train",

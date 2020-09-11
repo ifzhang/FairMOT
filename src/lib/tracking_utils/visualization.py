@@ -32,7 +32,7 @@ def plot_tracking(image, tlwhs, obj_ids, scores=None, frame_id=0, fps=0., ids2=N
     top_view = np.zeros([im_w, im_w, 3], dtype=np.uint8) + 255
 
     text_scale = max(1, image.shape[1] / 1600.)
-    text_thickness = 1 if text_scale > 1.1 else 1
+    text_thickness = 2
     line_thickness = max(1, int(image.shape[1] / 500.))
 
     radius = max(5, int(im_w/140.))

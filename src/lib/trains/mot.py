@@ -3,16 +3,17 @@ from __future__ import division
 from __future__ import print_function
 
 import math
-
 import torch
+import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-from models.decode import mot_decode
-from models.losses import FocalLoss
+import torchvision
+
+from models.losses import FocalLoss, TripletLoss
 from models.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
+from models.decode import mot_decode
 from models.utils import _sigmoid, _tranpose_and_gather_feat
 from utils.post_process import ctdet_post_process
-
 from .base_trainer import BaseTrainer
 
 
@@ -61,13 +62,34 @@ class MotLoss(torch.nn.Module):
                                           batch['ind'], batch['reg']) / opt.num_stacks
 
             if opt.id_weight > 0:
+                '''
+                ids_label_9 = batch['ids'].repeat(1, 9)     # batch, 9K
+                mask_label_9 = batch['reg_mask'].repeat(1, 9)     # batch, 9K
+                ind_labels_9 = batch['ind'].repeat(1, 9)     # batch, 9K
+                K = opt.K
+                hm_w = output['hm'].shape[3]
+                hm_h = output['hm'].shape[2]
+                ind_labels_9[:, K:2 * K] -= 5
+                ind_labels_9[:, 2 * K:3 * K] += 5
+                ind_labels_9[:, 3 * K:4 * K] -= 5 * hm_w
+                ind_labels_9[:, 4 * K:5 * K] -= 5 * (hm_w - 1)
+                ind_labels_9[:, 5 * K:6 * K] -= 5 * (hm_w + 1)
+                ind_labels_9[:, 6 * K:7 * K] += 5 * hm_w
+                ind_labels_9[:, 7 * K:8 * K] += 5 * (hm_w - 1)
+                ind_labels_9[:, 8 * K:9 * K] += 5 * (hm_w + 1)
+                ind_labels_9 = torch.clamp(ind_labels_9, 0, hm_w * hm_h - 1)
+                id_head = _tranpose_and_gather_feat(output['id'], ind_labels_9)
+                id_head = id_head[mask_label_9 > 0].contiguous()
+                id_head = self.emb_scale * F.normalize(id_head)
+                id_target = ids_label_9[mask_label_9 > 0]
+                '''
                 id_head = _tranpose_and_gather_feat(output['id'], batch['ind'])
                 id_head = id_head[batch['reg_mask'] > 0].contiguous()
                 id_head = self.emb_scale * F.normalize(id_head)
                 id_target = batch['ids'][batch['reg_mask'] > 0]
+
                 id_output = self.classifier(id_head).contiguous()
                 id_loss += self.IDLoss(id_output, id_target)
-                #id_loss += self.IDLoss(id_output, id_target) + self.TriLoss(id_head, id_target)
 
         #loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + opt.off_weight * off_loss + opt.id_weight * id_loss
 
@@ -75,6 +97,7 @@ class MotLoss(torch.nn.Module):
 
         loss = torch.exp(-self.s_det) * det_loss + torch.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
         loss *= 0.5
+        #loss = det_loss
 
         #print(loss, hm_loss, wh_loss, off_loss, id_loss)
 

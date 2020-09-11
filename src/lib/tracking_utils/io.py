@@ -75,6 +75,8 @@ def read_mot_results(filename, is_gt, is_ignore):
                     continue
                 results_dict.setdefault(fid, list())
 
+                box_size = float(linelist[4]) * float(linelist[5])
+
                 if is_gt:
                     if 'MOT16-' in filename or 'MOT17-' in filename:
                         label = int(float(linelist[7]))
@@ -93,6 +95,11 @@ def read_mot_results(filename, is_gt, is_ignore):
                     score = 1
                 else:
                     score = float(linelist[6])
+
+                #if box_size > 7000:
+                #if box_size <= 7000 or box_size >= 15000:
+                #if box_size < 15000:
+                    #continue
 
                 tlwh = tuple(map(float, linelist[2:6]))
                 target_id = int(linelist[1])

@@ -45,7 +45,7 @@ def _topk(scores, K=40):
     return topk_score, topk_inds, topk_clses, topk_ys, topk_xs
 
 
-def mot_decode(heat, wh, reg=None, cat_spec_wh=False, K=100):
+def mot_decode(heat, wh, reg=None, ltrb=False, K=100):
     batch, cat, height, width = heat.size()
 
     # heat = torch.sigmoid(heat)
@@ -62,18 +62,22 @@ def mot_decode(heat, wh, reg=None, cat_spec_wh=False, K=100):
         xs = xs.view(batch, K, 1) + 0.5
         ys = ys.view(batch, K, 1) + 0.5
     wh = _tranpose_and_gather_feat(wh, inds)
-    if cat_spec_wh:
-        wh = wh.view(batch, K, cat, 2)
-        clses_ind = clses.view(batch, K, 1, 1).expand(batch, K, 1, 2).long()
-        wh = wh.gather(2, clses_ind).view(batch, K, 2)
+    if ltrb:
+        wh = wh.view(batch, K, 4)
     else:
         wh = wh.view(batch, K, 2)
     clses = clses.view(batch, K, 1).float()
     scores = scores.view(batch, K, 1)
-    bboxes = torch.cat([xs - wh[..., 0:1] / 2,
-                        ys - wh[..., 1:2] / 2,
-                        xs + wh[..., 0:1] / 2,
-                        ys + wh[..., 1:2] / 2], dim=2)
+    if ltrb:
+        bboxes = torch.cat([xs - wh[..., 0:1],
+                            ys - wh[..., 1:2],
+                            xs + wh[..., 2:3],
+                            ys + wh[..., 3:4]], dim=2)
+    else:
+        bboxes = torch.cat([xs - wh[..., 0:1] / 2,
+                            ys - wh[..., 1:2] / 2,
+                            xs + wh[..., 0:1] / 2,
+                            ys + wh[..., 1:2] / 2], dim=2)
     detections = torch.cat([bboxes, scores, clses], dim=2)
 
     return detections, inds

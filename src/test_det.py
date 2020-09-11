@@ -104,7 +104,7 @@ def test_det(
         wh = output['wh']
         reg = output['reg'] if opt.reg_offset else None
         opt.K = 200
-        detections, inds = mot_decode(hm, wh, reg=reg, cat_spec_wh=opt.cat_spec_wh, K=opt.K)
+        detections, inds = mot_decode(hm, wh, reg=reg, ltrb=opt.ltrb, K=opt.K)
         # Compute average precision for each sample
         targets = [targets[i][:int(l)] for i, l in enumerate(targets_len)]
         for si, labels in enumerate(targets):

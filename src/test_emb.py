@@ -108,4 +108,4 @@ if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '1'
     opt = opts().init()
     with torch.no_grad():
-        map = test_emb(opt, batch_size=4)
+        tpr = test_emb(opt, batch_size=4)

@@ -6,22 +6,25 @@
 
 A simple baseline for one-shot multi-object tracking:
 ![](assets/pipeline.png)
-> [**A Simple Baseline for Multi-Object Tracking**](http://arxiv.org/abs/2004.01888),            
+> [**FairMOT: On the Fairness of Detection and Re-Identification in Multiple Object Tracking**](http://arxiv.org/abs/2004.01888),            
 > Yifu Zhang, Chunyu Wang, Xinggang Wang, Wenjun Zeng, Wenyu Liu,        
 > *arXiv technical report ([arXiv 2004.01888](http://arxiv.org/abs/2004.01888))*
 ## Abstract
 There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. We hope this baseline could inspire and help evaluate new ideas in this field.
 
+## News
+* (2020.09.10) A new version of FairMOT is released! (73.7 MOTA on MOT17)
+
 ## Tracking performance
 ### Results on MOT challenge test set
 | Dataset    |  MOTA | IDF1 | IDS | MT | ML | FPS |
 |--------------|-----------|--------|-------|----------|----------|--------|
-|2DMOT15  | 59.0 | 62.2 |  582 | 45.6% | 11.5% | 30.5 |
-|MOT16       | 68.7 | 70.4 | 953 | 39.5% | 19.0% | 25.9 |
-|MOT17       | 67.5 | 69.8 | 2868 | 37.7% | 20.8% | 25.9 |
-|MOT20       | 58.7 | 63.7 | 6013 | 66.3% | 8.5% | 13.2 |
+|2DMOT15  | 60.6 | 64.7 |  591 | 47.6% | 11.0% | 30.5 |
+|MOT16       | 74.9 | 72.8 | 1074 | 44.7% | 15.9% | 25.9 |
+|MOT17       | 73.7 | 72.3 | 3303 | 43.2% | 17.3% | 25.9 |
+|MOT20       | 61.8 | 67.3 | 5243 | 68.8% | 7.6% | 13.2 |
 
- All of the results are obtained on the [MOT challenge](https://motchallenge.net) evaluation server under the “private detector” protocol. We rank first among all the trackers on 2DMOT15, MOT17 and the recently released (2020.02.29) MOT20. Note that our IDF1 score remarkably outperforms other one-shot MOT trackers by more than **10 points**. The tracking speed of the entire system can reach up to **30 FPS**.
+ All of the results are obtained on the [MOT challenge](https://motchallenge.net) evaluation server under the “private detector” protocol. We rank first among all the trackers on 2DMOT15, MOT16, MOT17 and  MOT20. The tracking speed of the entire system can reach up to **30 FPS**.
 
 ### Video demos on MOT challenge test set
 <img src="assets/MOT15.gif" width="400"/>   <img src="assets/MOT16.gif" width="400"/>
@@ -37,15 +40,38 @@ conda activate FairMOT
 conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
 cd ${FAIRMOT_ROOT}
 pip install -r requirements.txt
-cd src/lib/models/networks/DCNv2_new sh make.sh
 ```
 * We use [DCNv2](https://github.com/CharlesShang/DCNv2) in our backbone network and more details can be found in their repo. 
+```
+git clone https://github.com/CharlesShang/DCNv2
+cd DCNv2
+./make.sh
+```
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
 
 ## Data preparation
 
-We use the same training data as [JDE](https://github.com/Zhongdao/Towards-Realtime-MOT). Please refer to their [DATA ZOO](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) to download and prepare all the training data including Caltech Pedestrian, CityPersons, CUHK-SYSU, PRW, ETHZ, MOT17 and MOT16. 
-
+* **CrowdHuman**
+The CrowdHuman dataset can be downloaded from their [official webpage](https://www.crowdhuman.org). After downloading, you should prepare the data in the following structure:
+```
+crowdhuman
+   |——————images
+   |        └——————train
+   |        └——————val
+   └——————labels_with_ids
+   |         └——————train(empty)
+   |         └——————val(empty)
+   └------annotation_train.odgt
+   └------annotation_val.odgt
+```
+Then, you can change the paths in src/gen_labels_crowd.py and run:
+```
+cd src
+python gen_labels_crowd.py
+```
+* **MIX**
+We use the same training data as [JDE](https://github.com/Zhongdao/Towards-Realtime-MOT) in this part and we call it "MIX". Please refer to their [DATA ZOO](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) to download and prepare all the training data including Caltech Pedestrian, CityPersons, CUHK-SYSU, PRW, ETHZ, MOT17 and MOT16. 
+* **2DMOT15 and MOT20** 
 [2DMOT15](https://motchallenge.net/data/2D_MOT_2015/) and [MOT20](https://motchallenge.net/data/MOT20/) can be downloaded from the official webpage of MOT challenge. After downloading, you should prepare the data in the following structure:
 ```
 MOT15
@@ -84,77 +110,92 @@ ${FAIRMOT_ROOT}
 ```
 * **Baseline model**
 
-Our baseline FairMOT model can be downloaded here: DLA-34: [[Google]](https://drive.google.com/open?id=1udpOPum8fJdoEQm6n0jsIgMMViOMFinu) [[Baidu, code: 88yn]](https://pan.baidu.com/s/1YQGulGblw_hrfvwiO6MIvA). HRNetV2_W18: [[Google]](https://drive.google.com/open?id=182EHCOSzVVopvAqAXN5o6XHX4PEyLjZT) [[Baidu, code: z4ft]](https://pan.baidu.com/s/1h1qwn8dyJmKj_nZi5H3NAQ).
+Our baseline FairMOT model (DLA-34 backbone) is pretrained on the CrowdHuman for 60 epochs with the self-supervised learning approach and then trained on the MIX dataset for 30 epochs. The models can be downloaded here: 
+crowdhuman_dla34.pth [[Google]](https://drive.google.com/file/d/1SFOhg_vos_xSYHLMTDGFVZBYjo8cr2fG/view?usp=sharing) [[Baidu, code:ggzx ]](https://pan.baidu.com/s/1JZMCVDyQnQCa5veO73YaMw) [[Onedrive]](https://microsoftapc-my.sharepoint.com/:u:/g/personal/v-yifzha_microsoft_com/EUsj0hkTNuhKkj9bo9kE7ZsBpmHvqDz6DylPQPhm94Y08w?e=3OF4XN).
+fairmot_dla34.pth [[Google]](https://drive.google.com/file/d/1iqRQjsG9BawIl8SlFomMg5iwkb6nqSpi/view?usp=sharing) [[Baidu, code:uouv]](https://pan.baidu.com/s/1H1Zp8wrTKDk20_DSPAeEkg) [[Onedrive]](https://microsoftapc-my.sharepoint.com/:u:/g/personal/v-yifzha_microsoft_com/EWHN_RQA08BDoEce_qFW-ogBNUsb0jnxG3pNS3DJ7I8NmQ?e=p0Pul1). (This is the model we get 73.7 MOTA on the MOT17 test set. )
 After downloading, you should put the baseline model in the following structure:
 ```
 ${FAIRMOT_ROOT}
    └——————models
-           └——————all_dla34.pth
-           └——————all_hrnet_v2_w18.pth
+           └——————fairmot_dla34.pth
            └——————...
 ```
 
 ## Training
 * Download the training data
 * Change the dataset root directory 'root' in src/lib/cfg/data.json and 'data_dir' in src/lib/opts.py
-* Run:
+* Pretrain on CrowdHuman and train on MIX:
 ```
-sh experiments/all_dla34.sh
+sh experiments/crowdhuman_dla34.sh
+sh experiments/mix_ft_ch_dla34.sh
 ```
+* Only train on MIX:
+```
+sh experiments/mix_dla34.sh
+```
+* Only train on MOT17:
+```
+sh experiments/mot17_dla34.sh
+```
+* Finetune on 2DMOT15 using the baseline model:
+```
+sh experiments/mot15_ft_mix_dla34.sh
+```
+* Finetune on MOT20 using the baseline model:
+```
+sh experiments/mot20_ft_mix_dla34.sh
+```
+* For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA:
+```
+sh experiments/mix_mot17_half_dla34.sh
+sh experiments/mix_mot17_half_hrnet18.sh
+sh experiments/mix_mot17_half_res34.sh
+sh experiments/mix_mot17_half_res34fpn.sh
+sh experiments/mix_mot17_half_res50.sh
+```
+* Performance on the test set of MOT17 when using different training data:
+
+| Training Data    |  MOTA | IDF1 | IDS     |
+|--------------|-----------|--------|-------|
+|MOT17  | 69.8 | 69.9 | 3996                |
+|MIX       | 72.9 | 73.2 | 3345             |
+|CrowdHuman + MIX     | 73.7 | 72.3 | 3303  |
 
 ## Tracking
-* The default settings run tracking on the validation dataset from 2DMOT15. Using the DLA-34 baseline model, you can run:
+* The default settings run tracking on the validation dataset from 2DMOT15. Using the baseline model, you can run:
 ```
 cd src
-python track.py mot --load_model ../models/all_dla34.pth --conf_thres 0.6
+python track.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.6
 ```
-to see the tracking results (76.1 MOTA using the DLA-34 baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
-
-Using the HRNetV2-W18 baseline model, you can run:
+to see the tracking results (76.5 MOTA and 79.3 IDF1 using the baseline model). You can also set save_images=True in src/track.py to save the visualization results of each frame. 
+* For ablation study, we evaluate on the other half of the training set of MOT17, you can run:
 ```
 cd src
-python track.py mot --load_model ../models/all_hrnet_v2_w18.pth --conf_thres 0.6 --arch hrnet_18 --reid_dim 128
+python track.py mot --load_model ../exp/mot/mix_mot17_half_dla34.pth --conf_thres 0.4
 ```
-to see the tracking results (76.6 MOTA using the HRNetV2-W18 baseline model).
-
 * To get the txt results of the test set of MOT16 or MOT17, you can run:
 ```
 cd src
-python track.py mot --test_mot17 True --load_model ../models/all_dla34.pth --conf_thres 0.4
-python track.py mot --test_mot16 True --load_model ../models/all_dla34.pth --conf_thres 0.4
+python track.py mot --test_mot17 True --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
+python track.py mot --test_mot16 True --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
 ```
-and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 67.5 MOTA on MOT17 test set using the baseline model 'all_dla34.pth'.)
+and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 73+ MOTA on MOT17 test set using the baseline model 'fairmot_dla34.pth'.)
 
-* To get the SOTA results of 2DMOT15 and MOT20, you need to finetune the baseline model on the specific dataset because our training set do not contain them. You can run:
-```
-sh experiments/ft_mot15_dla34.sh
-sh experiments/ft_mot20_dla34.sh
-```
-and then run the tracking code:
+* To get the SOTA results of 2DMOT15 and MOT20, run the tracking code:
 ```
 cd src
 python track.py mot --test_mot15 True --load_model your_mot15_model.pth --conf_thres 0.3
-python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3 --K 500
+python track.py mot --test_mot20 True --load_model your_mot20_model.pth --conf_thres 0.3
 ```
-Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20. You can also use the SOTA MOT20 pretrained model here [[Google]](https://drive.google.com/open?id=1GInbQoCtp1KHVrhzEof77Wt07fvwHcXb), [[Baidu],code:mqnz](https://pan.baidu.com/s/1c0reh3XDnbeoPZ4zFIvzGg):
-```
-python track.py mot --test_mot20 True --load_model ../models/mot20_dla34.pth --reid_dim 128 --conf_thres 0.3 --K 500
-```
-After evaluating on MOT challenge server, you can get 58.7 MOTA on MOT20 test set using the model 'mot20_dla34.pth'.
+Results of the test set all need to be evaluated on the MOT challenge server. You can see the tracking results on the training set by setting --val_motxx True and run the tracking code. We set 'conf_thres' 0.4 for MOT16 and MOT17. We set 'conf_thres' 0.3 for 2DMOT15 and MOT20. 
 
 ## Demo
 You can input a raw video and get the demo video by running src/demo.py and get the mp4 format of the demo video:
 ```
 cd src
-python demo.py mot --load_model ../models/all_dla34.pth --conf_thres 0.4
+python demo.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
 ```
 You can change --input-video and --output-root to get the demos of your own videos.
-
-If you have difficulty building DCNv2 and thus cannot use the DLA-34 baseline model, you can run the demo with the HRNetV2_w18 baseline model (don't forget to comment lines with 'dcn' in src/libs/models/model.py if you do not build DCNv2): 
-```
-cd src
-python demo.py mot --load_model ../models/all_hrnet_v2_w18.pth --arch hrnet_18 --reid_dim 128 --conf_thres 0.4
-```
 --conf_thres can be set from 0.3 to 0.7 depending on your own videos.
 
 ## Acknowledgement
@@ -170,3 +211,4 @@ A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https:
   year={2020}
 }
 ```
+
