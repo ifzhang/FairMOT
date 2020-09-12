@@ -15,6 +15,10 @@ There has been remarkable progress on object detection and re-identification in 
 ## News
 * (2020.09.10) A new version of FairMOT is released! (73.7 MOTA on MOT17)
 
+## Main updates
+* We pretrain FairMOT on the CrowdHuman dataset using a self-supervised learning approach.
+* To detect bounding boxes outside the image, we use left, top, right and bottom (4 channel) to replace the WH head (2 channel). 
+
 ## Tracking performance
 ### Results on MOT challenge test set
 | Dataset    |  MOTA | IDF1 | IDS | MT | ML | FPS |
