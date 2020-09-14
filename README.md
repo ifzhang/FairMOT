@@ -208,8 +208,8 @@ A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https:
 ## Citation
 
 ```
-@article{zhang2020simple,
-  title={A Simple Baseline for Multi-Object Tracking},
+@article{zhang2020fair,
+  title={FairMOT: On the Fairness of Detection and Re-Identification in Multiple Object Tracking},
   author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu},
   journal={arXiv preprint arXiv:2004.01888},
   year={2020}
