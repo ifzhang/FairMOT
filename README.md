@@ -175,7 +175,7 @@ to see the tracking results (76.5 MOTA and 79.3 IDF1 using the baseline model). 
 * For ablation study, we evaluate on the other half of the training set of MOT17, you can run:
 ```
 cd src
-python track.py mot --load_model ../exp/mot/mix_mot17_half_dla34.pth --conf_thres 0.4
+python track_half.py mot --load_model ../exp/mot/mix_mot17_half_dla34.pth --conf_thres 0.4 --val_mot17 True
 ```
 * To get the txt results of the test set of MOT16 or MOT17, you can run:
 ```
