@@ -46,43 +46,15 @@ class MotLoss(torch.nn.Module):
 
             hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
             if opt.wh_weight > 0:
-                if opt.dense_wh:
-                    mask_weight = batch['dense_wh_mask'].sum() + 1e-4
-                    wh_loss += (
-                                   self.crit_wh(output['wh'] * batch['dense_wh_mask'],
-                                                batch['dense_wh'] * batch['dense_wh_mask']) /
-                                   mask_weight) / opt.num_stacks
-                else:
-                    wh_loss += self.crit_reg(
-                        output['wh'], batch['reg_mask'],
-                        batch['ind'], batch['wh']) / opt.num_stacks
+                wh_loss += self.crit_reg(
+                    output['wh'], batch['reg_mask'],
+                    batch['ind'], batch['wh']) / opt.num_stacks
 
             if opt.reg_offset and opt.off_weight > 0:
                 off_loss += self.crit_reg(output['reg'], batch['reg_mask'],
                                           batch['ind'], batch['reg']) / opt.num_stacks
 
             if opt.id_weight > 0:
-                '''
-                ids_label_9 = batch['ids'].repeat(1, 9)     # batch, 9K
-                mask_label_9 = batch['reg_mask'].repeat(1, 9)     # batch, 9K
-                ind_labels_9 = batch['ind'].repeat(1, 9)     # batch, 9K
-                K = opt.K
-                hm_w = output['hm'].shape[3]
-                hm_h = output['hm'].shape[2]
-                ind_labels_9[:, K:2 * K] -= 5
-                ind_labels_9[:, 2 * K:3 * K] += 5
-                ind_labels_9[:, 3 * K:4 * K] -= 5 * hm_w
-                ind_labels_9[:, 4 * K:5 * K] -= 5 * (hm_w - 1)
-                ind_labels_9[:, 5 * K:6 * K] -= 5 * (hm_w + 1)
-                ind_labels_9[:, 6 * K:7 * K] += 5 * hm_w
-                ind_labels_9[:, 7 * K:8 * K] += 5 * (hm_w - 1)
-                ind_labels_9[:, 8 * K:9 * K] += 5 * (hm_w + 1)
-                ind_labels_9 = torch.clamp(ind_labels_9, 0, hm_w * hm_h - 1)
-                id_head = _tranpose_and_gather_feat(output['id'], ind_labels_9)
-                id_head = id_head[mask_label_9 > 0].contiguous()
-                id_head = self.emb_scale * F.normalize(id_head)
-                id_target = ids_label_9[mask_label_9 > 0]
-                '''
                 id_head = _tranpose_and_gather_feat(output['id'], batch['ind'])
                 id_head = id_head[batch['reg_mask'] > 0].contiguous()
                 id_head = self.emb_scale * F.normalize(id_head)
