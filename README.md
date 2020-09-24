@@ -157,6 +157,7 @@ sh experiments/mix_mot17_half_res34.sh
 sh experiments/mix_mot17_half_res34fpn.sh
 sh experiments/mix_mot17_half_res50.sh
 ```
+The ablation study model 'mix_mot17_half_dla34.pth' can be downloaded here: [[Google]](https://drive.google.com/file/d/1dJDGSa6-FMq33XY-cOd_nYxuilv30YDM/view?usp=sharing) [[Onedrive]](https://microsoftapc-my.sharepoint.com/:u:/g/personal/v-yifzha_microsoft_com/ESh1SlUvZudKgUX4A8E3yksBhfRHIf2AsKaaPJ-v_5lVAw?e=NB6UHR) [[Baidu, code:iifa]](https://pan.baidu.com/s/1RQD8ik1labWuwd8jJ-0ukQ).
 * Performance on the test set of MOT17 when using different training data:
 
 | Training Data    |  MOTA | IDF1 | IDS     |
@@ -177,6 +178,7 @@ to see the tracking results (76.5 MOTA and 79.3 IDF1 using the baseline model). 
 cd src
 python track_half.py mot --load_model ../exp/mot/mix_mot17_half_dla34.pth --conf_thres 0.4 --val_mot17 True
 ```
+If you use our pretrained model 'mix_mot17_half_dla34.pth', you can get 69.1 MOTA and 72.8 IDF1. 
 * To get the txt results of the test set of MOT16 or MOT17, you can run:
 ```
 cd src
