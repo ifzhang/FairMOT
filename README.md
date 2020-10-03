@@ -204,6 +204,13 @@ python demo.py mot --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
 You can change --input-video and --output-root to get the demos of your own videos.
 --conf_thres can be set from 0.3 to 0.7 depending on your own videos.
 
+## Train on custom dataset
+You can train FairMOT on custom dataset by following several steps bellow:
+1. Generate one txt label file for one image. Each line of the txt label file represents one object. The format of the line is: "class id x_center/img_width y_center/img_height w/img_width h/img_height". You can modify src/gen_labels_16.py to generate label files for your custom dataset.
+2. Generate files containing image paths. The example files are in src/data/. Some similar code can be found in src/gen_labels_crowd.py
+3. Create a json file for your custom dataset in src/lib/cfg/. You need to specify the "root" and "train" keys in the json file. You can find some examples in src/lib/cfg/.
+4. Add --data_cfg '../src/lib/cfg/your_dataset.json' when training. 
+
 ## Acknowledgement
 A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https://github.com/Zhongdao/Towards-Realtime-MOT) and [xingyizhou/CenterNet](https://github.com/xingyizhou/CenterNet). Thanks for their wonderful works.
 
