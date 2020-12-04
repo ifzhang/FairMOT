@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torchvision
 
 from fairmot.models.losses import FocalLoss, TripletLoss
-from fairmot.odels.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
+from fairmot.models.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
 from fairmot.models.decode import mot_decode
 from fairmot.models.utils import _sigmoid, _tranpose_and_gather_feat
 from fairmot.utils.post_process import ctdet_post_process
