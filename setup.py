@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 def find_packages_in_package_dir(package_name: str, package_dir: str) -> List[str]:
     """Finds packages inside package_dir and returns them in the package_name namespace."""
-    packages = []
+    packages = [package_name]
     for sub_package in setuptools.find_namespace_packages(package_dir):
         packages.append(package_name + "." + sub_package)
 
