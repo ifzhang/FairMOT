@@ -4,7 +4,7 @@ import copy
 import motmetrics as mm
 mm.lap.default_solver = 'lap'
 
-from tracking_utils.io import read_results, unzip_objs
+from fairmot.tracking_utils.io import read_results, unzip_objs
 
 
 class Evaluator(object):
