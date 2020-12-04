@@ -1,7 +1,19 @@
+import os
 import setuptools
+from typing import List
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
+
+
+def find_packages_in_package_dir(package_name: str, package_dir: str) -> List[str]:
+    """Finds packages inside package_dir and returns them in the package_name namespace."""
+    packages = []
+    for sub_package in setuptools.find_namespace_packages(package_dir):
+        packages.append(package_name + "." + sub_package)
+
+    return packages
+
 
 setuptools.setup(
     name="fairmot",
@@ -11,7 +23,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ifzhang/FairMOT",
-    packages=["fairmot"],
+    packages=find_packages_in_package_dir("fairmot", "src/lib"),
     package_dir={"fairmot": "src/lib"},
     classifiers=[
         "Programming Language :: Python :: 3",
