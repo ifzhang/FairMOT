@@ -52,7 +52,20 @@ cd DCNv2
 ./make.sh
 ```
 * In order to run the code for demos, you also need to install [ffmpeg](https://www.ffmpeg.org/).
-
+### Lib Installation
+* If using the `lib` in another project you can install it as `fairmot`.
+```sh
+# to install from the root of the cloned repo
+pip install .
+# to install directly from github
+pip install git+https://github.com/ifzhang/FairMOT.git
+```
+* To use the `lib` you may import it as `fairmot`.
+```python
+import fairmot
+import fairmot.tracker.multitracker as mt
+...
+```
 ## Data preparation
 
 * **CrowdHuman**
