@@ -328,6 +328,24 @@ def random_affine(img, targets=None, degrees=(-10, 10), translate=(.1, .1), scal
         return imw
 
 
+def collate_fn(batch):
+    imgs, labels, paths, sizes = zip(*batch)
+    batch_size = len(labels)
+    imgs = torch.stack(imgs, 0)
+    max_box_len = max([l.shape[0] for l in labels])
+    labels = [torch.from_numpy(l) for l in labels]
+    filled_labels = torch.zeros(batch_size, max_box_len, 6)
+    labels_len = torch.zeros(batch_size)
+
+    for i in range(batch_size):
+        isize = labels[i].shape[0]
+        if len(labels[i]) > 0:
+            filled_labels[i, :isize, :] = labels[i]
+        labels_len[i] = isize
+
+    return imgs, filled_labels, paths, sizes, labels_len.unsqueeze(1)
+
+
 class JointDataset(LoadImagesAndLabels):  # for training
     default_resolution = [1088, 608]
     mean = None
