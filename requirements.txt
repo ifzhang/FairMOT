@@ -6,7 +6,6 @@ scipy
 numba
 progress
 motmetrics
-numba
 matplotlib
 lap
 openpyxl
