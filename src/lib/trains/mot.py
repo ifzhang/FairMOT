@@ -40,8 +40,8 @@ class MotLoss(torch.nn.Module):
         hm_loss, wh_loss, off_loss, id_loss = 0, 0, 0, 0
         for s in range(opt.num_stacks):
             output = outputs[s]
-            if not opt.mse_loss:
-                output['hm'] = _sigmoid(output['hm'])
+
+            output['hm'] = _sigmoid(output['hm'])
 
             hm_loss += self.crit(output['hm'], batch['hm']) / opt.num_stacks
             if opt.wh_weight > 0:
