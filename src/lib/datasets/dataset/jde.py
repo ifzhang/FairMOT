@@ -439,7 +439,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
 
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
-        for k in range(num_objs):
+        for k in range(min(num_objs, self.max_objs)):
             label = labels[k]
             bbox = label[2:]
             cls_id = int(label[0])
