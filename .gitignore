@@ -1,1 +1,4 @@
+/secret_debug.env
+*.pth
 .idea
+__pycache__

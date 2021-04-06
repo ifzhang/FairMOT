@@ -1,0 +1,17 @@
+{
+  "name": "Video tags quantitative stats",
+  "type": "app",
+  "categories": [
+    "Videos"
+  ],
+  "description": "Video tags quantitative stats",
+  "docker_image": "supervisely/base-py-sdk:6",
+  "main_script": "src/video-tags-stats.py",
+  "task_location": "application_sessions",
+  "icon": "https://img.icons8.com/color/96/000000/group.png",
+  "icon_background": "#FFFFFF",
+  "headless": true,
+  "context_menu": {
+    "target": ["videos_project"]   
+  }
+}
