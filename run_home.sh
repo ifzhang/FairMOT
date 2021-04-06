@@ -26,12 +26,11 @@ docker run \
     -v ~/.Xauthority:/root/.Xauthority \
     --shm-size='1G' \
     -e PYTHONUNBUFFERED='1' \
-    -e SERVER_ADDRESS='https://app.supervise.ly' \
-    -e API_TOKEN='P78DuO37grwKNbGikDso72gphdCICDsiTXflvSGVEiendUhnJz93Pm48KKPAlgh2k68TPIAR7LPW1etGPiATM1ZOQL8iFVfWjt8gUphxps3IOSicrm6m0gv2cQh3lfww' \
+    -e SERVER_ADDRESS='http://78.46.75.100:38585' \
+    -e API_TOKEN='0e3NJFlXteWPp1PAtA5fDrIkdtGeh42iTSVd6J2ecMn1hZW497M1SWd2DLEHhdUDaliPVe6eI9SChBZLBsKTVyTlgrsn240eJ9gObtUMis2vmSsFDr5yhssFX3iHtStJ' \
     -v /home/andrew/alex_work/app/FairMOT:/alex_work \
     -v /usr/local/cuda-9.1:/usr/local/cuda \
     -v /opt/pycharm:/pycharm \
     -v /home/andrew/pycharm-settings/smtool_gui:/root/.PyCharmCE2018.2 \
     -v /home/andrew/pycharm-settings/smtool_gui__idea:/workdir/.idea \
-    --add-host="app.supervise.ly:136.243.97.171" \
     fairmot
