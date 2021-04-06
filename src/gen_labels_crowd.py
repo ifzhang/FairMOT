@@ -3,7 +3,7 @@ import os
 import cv2
 import json
 import numpy as np
-
+from pathlib import Path
 
 def mkdirs(d):
     if not osp.exists(d):
@@ -49,12 +49,13 @@ def gen_labels_crowd(data_root, label_root, ann_root):
 
 
 if __name__ == '__main__':
-    data_val = '/data/yfzhang/MOT/JDE/crowdhuman/images/val'
-    label_val = '/data/yfzhang/MOT/JDE/crowdhuman/labels_with_ids/val'
-    ann_val = '/data/yfzhang/MOT/JDE/crowdhuman/annotation_val.odgt'
-    data_train = '/data/yfzhang/MOT/JDE/crowdhuman/images/train'
-    label_train = '/data/yfzhang/MOT/JDE/crowdhuman/labels_with_ids/train'
-    ann_train = '/data/yfzhang/MOT/JDE/crowdhuman/annotation_train.odgt'
+    root_path = Path('../CrowdHuman')
+    data_val = root_path/'images/val'
+    label_val = root_path/'labels_with_ids/val'
+    ann_val = root_path/'annotation_val.odgt'
+    data_train = root_path/'images/train'
+    label_train = root_path/'labels_with_ids/train'
+    ann_train = root_path/'annotation_train.odgt'
     gen_labels_crowd(data_train, label_train, ann_train)
     gen_labels_crowd(data_val, label_val, ann_val)
 
