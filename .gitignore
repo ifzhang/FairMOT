@@ -1,2 +1,7 @@
+__pycache__/.
 .idea
 *.json
+*.pyc
+.pylintrc
+/CrowdHuman
+/models
