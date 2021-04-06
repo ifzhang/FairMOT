@@ -484,7 +484,7 @@ class DLASeg(nn.Module):
 
 def get_pose_net(num_layers, heads, head_conv=256, down_ratio=4):
   model = DLASeg('dla{}'.format(num_layers), heads,
-                 pretrained=True,
+                 pretrained=False,
                  down_ratio=down_ratio,
                  final_kernel=1,
                  last_level=5,
