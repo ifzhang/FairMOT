@@ -112,8 +112,6 @@ def fairmot_find_pedestrains(opt, project_id, video_id, end_frame=None, start_fr
                 left = 0
             if top < 0:
                 top = 0
-	    if right <= 0 or bottom <= 0 or left >= img_size[0] or top >= img_size[1]:
-	    	continue
 
             geom = sly.Rectangle(top, left, bottom, right)
             figure = sly.VideoFigure(ids_to_video_object[online_ids[idx]], geom, curr_frame)
