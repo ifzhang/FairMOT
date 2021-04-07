@@ -5,6 +5,7 @@ from __future__ import print_function
 import _init_paths
 
 import os
+import sys
 
 import json
 import torch
@@ -94,5 +95,8 @@ def main(opt):
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '0, 1'
-    opt = opts().parse()
+    # If we use VS debugger will pass current py code as first argument, we need to remove first argument. 
+    # PLEASE TURN IT OFF WHEN YOU FINISH DEBUGGING  
+    opt = opts().parse(sys.argv[1:])
+    # opt = opts().parse(sys.argv)
     main(opt)
