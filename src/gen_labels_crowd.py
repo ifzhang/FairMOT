@@ -49,7 +49,7 @@ def gen_labels_crowd(data_root, label_root, ann_root):
 
 
 if __name__ == '__main__':
-    root_path = Path('../CrowdHuman')
+    root_path = Path('../../MOT_data/crowdhuman')
     data_val = root_path/'images/val'
     label_val = root_path/'labels_with_ids/val'
     ann_val = root_path/'annotation_val.odgt'
