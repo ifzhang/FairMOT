@@ -1,7 +1,9 @@
 __pycache__/.
+cython_bbox-0.1.3/.
 .idea
 *.json
 *.pyc
 .pylintrc
 /CrowdHuman
 /models
+
