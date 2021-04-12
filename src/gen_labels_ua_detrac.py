@@ -13,6 +13,26 @@ def load_func(fpath):
     records =[json.loads(line.strip('\n')) for line in lines]
     return records
 
+def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
+    '''This is a function that read the list of given data under src/data
+        The name of the file will be [dataset_name.train] if 'train_set' is True, otherwise it will be [dataset_name.val]
+    '''
+    if train_set:
+        output_path = Path('data')/(dataset_name+'.train')
+    else:
+        output_path = Path('data')/(dataset_name+'.val')
+
+    with output_path.open('w') as f:
+        for sequence_path in ann_root.iterdir():
+            images_folder_path = data_root/Path(sequence_path).stem
+            if not images_folder_path.exists():
+                print('Sequence: '+images_folder_path.stem +'does not exist in data path!')
+                continue
+            for image_path in images_folder_path.iterdir():
+                f.write(str(image_path)+'\n')
+                
+            
+
 
 def gen_labels_uadetrac(data_root, label_root, ann_root, names):
     '''This is a function that read images (sequences) from data_root and annotation data from ann_root
@@ -76,6 +96,7 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
 
 
 if __name__ == '__main__':
+    dataset_name = 'UA-DETRAC'
     root_path = Path('../../MOT_data/UA-DETRAC')
 
     path_images = root_path/'DETRAC-Images'
@@ -96,5 +117,7 @@ if __name__ == '__main__':
         for i in names:
             print(i, file =out_txt_file )
 
-    gen_labels_uadetrac(path_images, label_train, ann_train, names)
-    gen_labels_uadetrac(path_images, label_val, ann_val,names)
+    #gen_labels_uadetrac(path_images, label_train, ann_train, names)
+    #gen_labels_uadetrac(path_images, label_val, ann_val,names)
+    gen_txt_sets_from_anno(dataset_name, path_images, ann_train, train_set = True)
+    gen_txt_sets_from_anno(dataset_name, path_images, ann_val, train_set = False)
