@@ -2,6 +2,7 @@ import numpy as np
 from pathlib import Path
 import xml.etree.ElementTree as ET
 import cv2
+import shutil
 
 def load_func(fpath):
     print('fpath', fpath)
@@ -19,8 +20,16 @@ def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
     '''
     if train_set:
         output_path = Path('data')/(dataset_name+'.train')
+        # create sub-directories to save images
+        if not (data_root/'train').exists():
+            (data_root/'train').mkdir()
     else:
         output_path = Path('data')/(dataset_name+'.val')
+        # create sub-directories to save images
+        if not (data_root/'test').exists():
+            (data_root/'test').mkdir()
+
+    
 
     with output_path.open('w') as f:
         for sequence_path in ann_root.iterdir():
@@ -28,11 +37,14 @@ def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
             if not images_folder_path.exists():
                 print('Sequence: '+images_folder_path.stem +'does not exist in data path!')
                 continue
-            for image_path in images_folder_path.iterdir():
-                f.write(str(image_path)+'\n')
-                
-            
 
+            if train_set:
+                images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'train'))
+            else:
+                images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'test'))
+
+            for image_path in Path(images_folder_path).iterdir():
+                f.write(str(image_path)+'\n')
 
 def gen_labels_uadetrac(data_root, label_root, ann_root, names):
     '''This is a function that read images (sequences) from data_root and annotation data from ann_root
@@ -99,7 +111,7 @@ if __name__ == '__main__':
     dataset_name = 'UA-DETRAC'
     root_path = Path('../../MOT_data/UA-DETRAC')
 
-    path_images = root_path/'DETRAC-Images'
+    path_images = root_path/'images'
     
     label_train = root_path/'labels_with_ids/train'
     ann_train = root_path / 'DETRAC-Train-Annotations-XML'
