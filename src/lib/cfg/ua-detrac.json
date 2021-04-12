@@ -1,0 +1,15 @@
+{
+    "root":"../../MOT_data/UA-DETRAC",
+    "train":
+    {
+        "UA-DETRAC":"./data/UA-DETRAC.train"
+    },
+    "test_emb":
+    {
+        "UA-DETRAC":"./data/UA-DETRAC.val"
+    },
+    "test":
+    {
+        "UA-DETRAC":"./data/UA-DETRAC.val"
+    }
+}
