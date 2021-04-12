@@ -97,7 +97,28 @@ cd src
 python gen_labels_15.py
 python gen_labels_20.py
 ```
-to generate the labels of 2DMOT15 and MOT20. The seqinfo.ini files of 2DMOT15 can be downloaded here [[Google]](https://drive.google.com/open?id=1kJYySZy7wyETH4fKMzgJrYUrTfxKlN1w), [[Baidu],code:8o0w](https://pan.baidu.com/s/1zb5tBW7-YTzWOXpd9IzS0g).
+
+* **UA-DETRAC** 
+[UA-DETRAC](https://detrac-db.rit.albany.edu/download) can be downloaded from the official webpage. After downloading, you should change the name of the folder 'UA-DETRAC-images' to 'images' and variable root_path in gen_labels_ua_detrac.py and run 
+```
+cd src
+python gen_labels_ua_detrac.py
+```
+gen_labels_ua-detrac.py will generate labels_with_ids folder and move sequences under images directory into train and test directories automatically.
+```
+UA-DETRAC
+   |——————images
+   |        └——————train
+   |        └——————test
+   └——————labels_with_ids
+            └——————train(empty)
+MOT20
+   |——————images
+   |        └——————train
+   |        └——————test
+   └——————labels_with_ids
+            └——————train(empty)
+```
 
 ## Pretrained models and baseline model
 * **Pretrained models**
