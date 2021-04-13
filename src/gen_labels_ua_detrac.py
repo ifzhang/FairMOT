@@ -3,6 +3,7 @@ from pathlib import Path
 import xml.etree.ElementTree as ET
 import cv2
 import shutil
+import collections
 
 def load_func(fpath):
     print('fpath', fpath)
@@ -29,13 +30,11 @@ def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
         if not (data_root/'test').exists():
             (data_root/'test').mkdir()
 
-    
-
     with output_path.open('w') as f:
         for sequence_path in ann_root.iterdir():
             images_folder_path = data_root/Path(sequence_path).stem
             if not images_folder_path.exists():
-                print('Sequence: '+images_folder_path.stem +'does not exist in data path!')
+                print('Sequence: '+images_folder_path.stem +' does not exist in data path!')
                 continue
 
             if train_set:
@@ -55,15 +54,34 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
     label_root.mkdir(parents = True, exist_ok = True)
 
     for sequence_path in ann_root.iterdir():
-        print('Processing sequence:'+sequence_path.name)
+        #if sequence_path.stem == 'MVI_39811':
+        seq_imgs_path = data_root/sequence_path.stem
+        # get the length of the video
+        total_frames = collections.Counter(p.suffix for p in seq_imgs_path.iterdir())['.jpg']
+
+        print('Processing sequence:{}, total frames:{}'.format(sequence_path.name, total_frames))
         tree = ET.parse(sequence_path)
         root = tree.getroot()
         fid = -1
+        frame_index_counter = 0
         tid_curr = 0
         for ann_data in root.iter():     
             if ann_data.tag == 'frame':
+                frame_index_counter += 1 
                 fid = int(ann_data.attrib['num']) # ID of frame in this sequence
                 num_objects = int(ann_data.attrib['density'])
+
+                # No object detected in these previous frames, create empty txt files
+                while frame_index_counter < fid:
+                    image_name = 'img{0:05d}.jpg'.format(frame_index_counter)
+                    img_path = data_root/sequence_path.stem/image_name
+                    if img_path.exists():
+                        label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
+                    else:
+                        print('Warning! Missed frame image {}'.format(frame_index_counter))
+                    open(label_fpath,'w').close()
+                    frame_index_counter +=1
+
                 image_name = 'img{0:05d}.jpg'.format(fid)
                 #print(i)
                 #anns_data = load_func(ann_root)
@@ -75,6 +93,10 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
                 )
                 img_height, img_width = img.shape[0:2]
 
+                label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
+                if not label_fpath.parents[0].exists():
+                    label_fpath.parents[0].mkdir(parents=True)
+                open(label_fpath,'w').close()
                 tid_curr = 0
                 for target in list(ann_data[0]):
                     #tid_curr = int(target.attrib['id'])
@@ -89,8 +111,6 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
                     x, y, w, h = float(anns['left']), float(anns['top']), float(anns['width']), float(anns['height'])
                     x += w / 2
                     y += h / 2
-                    label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
-                    
                     # Expected format: class id x_center/img_width y_center/img_height w/img_width h/img_height
                     #label_str = '0 {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(
                     #    tid_curr, x / img_width, y / img_height, w / img_width, h / img_height)
@@ -99,17 +119,23 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
                     label_str = '{:d} {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(names.index(target[1].attrib['vehicle_type']),
                         tid_curr, x / img_width, y / img_height, w / img_width, h / img_height)
 
-                    if not label_fpath.parents[0].exists():
-                        label_fpath.parents[0].mkdir(parents=True)
-
                     with label_fpath.open('a') as f:
                         f.write(label_str)
                     tid_curr += 1
+        while frame_index_counter <= total_frames:
+            # make sure all the images files has the anno txt even if there is no detected objects
+            image_name = 'img{0:05d}.jpg'.format(frame_index_counter)
+            label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
+            if not label_fpath.parents[0].exists():
+                label_fpath.parents[0].mkdir(parents=True)
+            open(label_fpath,'w').close()
+            frame_index_counter +=1
+
 
 
 if __name__ == '__main__':
     dataset_name = 'UA-DETRAC'
-    root_path = Path('../../MOT_data/UA-DETRAC')
+    root_path = Path('../../data/UA-DETRAC')
 
     path_images = root_path/'images'
     
@@ -129,7 +155,8 @@ if __name__ == '__main__':
         for i in names:
             print(i, file =out_txt_file )
 
-    #gen_labels_uadetrac(path_images, label_train, ann_train, names)
-    #gen_labels_uadetrac(path_images, label_val, ann_val,names)
     gen_txt_sets_from_anno(dataset_name, path_images, ann_train, train_set = True)
     gen_txt_sets_from_anno(dataset_name, path_images, ann_val, train_set = False)
+
+    gen_labels_uadetrac(path_images/'train', label_train, ann_train, names)
+    gen_labels_uadetrac(path_images/'test', label_val, ann_val,names)
