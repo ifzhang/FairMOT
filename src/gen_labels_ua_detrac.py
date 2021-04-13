@@ -19,27 +19,38 @@ def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
     '''This is a function that read the list of given data under src/data
         The name of the file will be [dataset_name.train] if 'train_set' is True, otherwise it will be [dataset_name.val]
     '''
+    move_directories = False
     if train_set:
         output_path = Path('data')/(dataset_name+'.train')
         # create sub-directories to save images
-        if not (data_root/'train').exists():
-            (data_root/'train').mkdir()
+        if data_root.name != 'train':
+            data_root = data_root/'train'    
+            if not data_root.exists():
+                move_directories = True
+                data_root.mkdir(parents = True)       
     else:
         output_path = Path('data')/(dataset_name+'.val')
         # create sub-directories to save images
-        if not (data_root/'test').exists():
-            (data_root/'test').mkdir()
+        if data_root.name != 'test':
+            data_root = data_root/'test'
+            if not data_root.exists():
+                move_directories = True
+                data_root.mkdir(parents=True)
 
     with output_path.open('w') as f:
         for sequence_path in ann_root.iterdir():
-            images_folder_path = data_root/Path(sequence_path).stem
+            if move_directories:
+                images_folder_path = data_root.parents[0]/Path(sequence_path).stem
+            else:
+                images_folder_path = data_root/Path(sequence_path).stem
+
             if not images_folder_path.exists():
                 print('Sequence: '+images_folder_path.stem +' does not exist in data path!')
                 continue
 
-            if train_set:
+            if train_set and images_folder_path.parents[0].name != 'train':
                 images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'train'))
-            else:
+            if not train_set and images_folder_path.parents[0].name != 'test':
                 images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'test'))
 
             for image_path in Path(images_folder_path).iterdir():
@@ -157,6 +168,6 @@ if __name__ == '__main__':
 
     gen_txt_sets_from_anno(dataset_name, path_images, ann_train, train_set = True)
     gen_txt_sets_from_anno(dataset_name, path_images, ann_val, train_set = False)
-
-    gen_labels_uadetrac(path_images/'train', label_train, ann_train, names)
-    gen_labels_uadetrac(path_images/'test', label_val, ann_val,names)
+    
+    #gen_labels_uadetrac(path_images/'train', label_train, ann_train, names)
+    #gen_labels_uadetrac(path_images/'test', label_val, ann_val,names)
