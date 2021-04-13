@@ -99,7 +99,7 @@ python gen_labels_20.py
 ```
 
 * **UA-DETRAC** 
-[UA-DETRAC](https://detrac-db.rit.albany.edu/download) can be downloaded from the official webpage. After downloading, you should change the name of the folder 'UA-DETRAC-images' to 'images' and variable root_path in gen_labels_ua_detrac.py and run 
+[UA-DETRAC](https://sites.google.com/view/daweidu/projects/ua-detrac) can be downloaded from the official webpage. After downloading, you should change the name of the folder 'UA-DETRAC-images' to 'images' and variable root_path in gen_labels_ua_detrac.py and run 
 ```
 cd src
 python gen_labels_ua_detrac.py
