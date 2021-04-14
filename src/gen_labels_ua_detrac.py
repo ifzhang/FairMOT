@@ -15,8 +15,8 @@ def load_func(fpath):
     records =[json.loads(line.strip('\n')) for line in lines]
     return records
 
-def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
-    '''This is a function that read the list of given data under src/data
+def gen_txt_sets_from_anno(dataset_name, data_root, label_root, train_set = True):
+    '''This is a function that read the list of images from label root eand generate all imags path under src/data
         The name of the file will be [dataset_name.train] if 'train_set' is True, otherwise it will be [dataset_name.val]
     '''
     move_directories = False
@@ -38,7 +38,7 @@ def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
                 data_root.mkdir(parents=True)
 
     with output_path.open('w') as f:
-        for sequence_path in ann_root.iterdir():
+        for sequence_path in label_root.iterdir():
             if move_directories:
                 images_folder_path = data_root.parents[0]/Path(sequence_path).stem
             else:
@@ -53,10 +53,10 @@ def gen_txt_sets_from_anno(dataset_name, data_root, ann_root, train_set = True):
             if not train_set and images_folder_path.parents[0].name != 'test':
                 images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'test'))
 
-            for image_path in Path(images_folder_path).iterdir():
-                f.write(str(image_path)+'\n')
+            output_images_path = [str(images_folder_path/x.name.replace('.txt','.jpg')) for x in Path(sequence_path).iterdir()]
+            f.write('\n'.join(output_images_path))
 
-def gen_labels_uadetrac(data_root, label_root, ann_root, names):
+def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_obj_frame = False):
     '''This is a function that read images (sequences) from data_root and annotation data from ann_root
        The generated label data (given in the path label_root) in txt files are the one used for train.py
        TODO: all gen_labels_*.py do not include the traking id information to generate txt under labels_with_ids. 
@@ -83,15 +83,16 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
                 num_objects = int(ann_data.attrib['density'])
 
                 # No object detected in these previous frames, create empty txt files
-                while frame_index_counter < fid:
-                    image_name = 'img{0:05d}.jpg'.format(frame_index_counter)
-                    img_path = data_root/sequence_path.stem/image_name
-                    if img_path.exists():
-                        label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
-                    else:
-                        print('Warning! Missed frame image {}'.format(frame_index_counter))
-                    open(label_fpath,'w').close()
-                    frame_index_counter +=1
+                if keep_no_obj_frame:
+                    while frame_index_counter < fid:
+                        image_name = 'img{0:05d}.jpg'.format(frame_index_counter)
+                        img_path = data_root/sequence_path.stem/image_name
+                        if img_path.exists():
+                            label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
+                        else:
+                            print('Warning! Missed frame image {}'.format(frame_index_counter))
+                        open(label_fpath,'w').close()
+                        frame_index_counter +=1
 
                 image_name = 'img{0:05d}.jpg'.format(fid)
                 #print(i)
@@ -115,7 +116,7 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
                     anns = target[0].attrib
                     # Control target objects by the conditions provided in target[1].attrib
                     # There are {orientation, speed, trajectory_length', 'truncation_ratio', 'vehicle_type'}
-                    if target[1].attrib['vehicle_type'] not in names:
+                    if target[1].attrib['vehicle_type'] not in objects_names:
                         print('Error that target object is not in provided class name list !')
                         break
 
@@ -127,26 +128,30 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, names):
                     #    tid_curr, x / img_width, y / img_height, w / img_width, h / img_height)
                     
                     # With the class id 
-                    label_str = '{:d} {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(names.index(target[1].attrib['vehicle_type']),
+                    label_str = '{:d} {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(objects_names.index(target[1].attrib['vehicle_type']),
                         tid_curr, x / img_width, y / img_height, w / img_width, h / img_height)
 
                     with label_fpath.open('a') as f:
                         f.write(label_str)
                     tid_curr += 1
-        while frame_index_counter <= total_frames:
-            # make sure all the images files has the anno txt even if there is no detected objects
-            image_name = 'img{0:05d}.jpg'.format(frame_index_counter)
-            label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
-            if not label_fpath.parents[0].exists():
-                label_fpath.parents[0].mkdir(parents=True)
-            open(label_fpath,'w').close()
-            frame_index_counter +=1
+
+        if keep_no_obj_frame:
+            while frame_index_counter <= total_frames:
+                # make sure all the images files has the anno txt even if there is no detected objects
+                image_name = 'img{0:05d}.jpg'.format(frame_index_counter)
+                label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
+                if not label_fpath.parents[0].exists():
+                    label_fpath.parents[0].mkdir(parents=True)
+                open(label_fpath,'w').close()
+                frame_index_counter +=1
+        # Generate list of images path for training (*.train) or for validation (*.val)
+        
 
 
 
 if __name__ == '__main__':
     dataset_name = 'UA-DETRAC'
-    root_path = Path('../../data/UA-DETRAC')
+    root_path = Path('../../MOT_data/UA-DETRAC')
 
     path_images = root_path/'images'
     
@@ -157,17 +162,17 @@ if __name__ == '__main__':
     ann_val = root_path / 'DETRAC-Test-Annotations-XML'
 
     # New classes name for CVAT label.txt
-    names = list(('car', 'bus', 'van','others'))
+    objects_names = list(('car', 'bus', 'van','others'))
     cvat_label_path = root_path/'for_cvat'/'labels.txt'
     if not cvat_label_path.parents[0].exists():
         cvat_label_path.parents[0].mkdir(parents=True)
 
     with cvat_label_path.open('w') as out_txt_file:
-        for i in names:
+        for i in objects_names:
             print(i, file =out_txt_file )
 
-    gen_txt_sets_from_anno(dataset_name, path_images, ann_train, train_set = True)
-    gen_txt_sets_from_anno(dataset_name, path_images, ann_val, train_set = False)
+    gen_txt_sets_from_anno(dataset_name, path_images, label_train, train_set = True)
+    gen_txt_sets_from_anno(dataset_name, path_images, label_val, train_set = False)
     
-    #gen_labels_uadetrac(path_images/'train', label_train, ann_train, names)
-    #gen_labels_uadetrac(path_images/'test', label_val, ann_val,names)
+    #gen_labels_uadetrac(path_images/'train', label_train, ann_train, objects_names)
+    #gen_labels_uadetrac(path_images/'test', label_val, ann_val,objects_names)
