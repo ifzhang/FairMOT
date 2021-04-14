@@ -19,50 +19,36 @@ def gen_txt_sets_from_anno(dataset_name, data_root, label_root, train_set = True
     '''This is a function that read the list of images from label root eand generate all imags path under src/data
         The name of the file will be [dataset_name.train] if 'train_set' is True, otherwise it will be [dataset_name.val]
     '''
-    move_directories = False
-    if train_set:
-        output_path = Path('data')/(dataset_name+'.train')
-        # create sub-directories to save images
-        if data_root.name != 'train':
-            data_root = data_root/'train'    
-            if not data_root.exists():
-                move_directories = True
-                data_root.mkdir(parents = True)       
-    else:
-        output_path = Path('data')/(dataset_name+'.val')
-        # create sub-directories to save images
-        if data_root.name != 'test':
-            data_root = data_root/'test'
-            if not data_root.exists():
-                move_directories = True
-                data_root.mkdir(parents=True)
+    output_path = Path('data')/(dataset_name+'.train') if train_set else Path('data')/(dataset_name+'.val')
+    data_root = data_root/'train' if train_set and data_root.name != 'train' else data_root
+    data_root = data_root/'test' if not train_set and data_root.name != 'test' else data_root
 
     with output_path.open('w') as f:
         for sequence_path in label_root.iterdir():
-            if move_directories:
-                images_folder_path = data_root.parents[0]/Path(sequence_path).stem
-            else:
-                images_folder_path = data_root/Path(sequence_path).stem
-
-            if not images_folder_path.exists():
-                print('Sequence: '+images_folder_path.stem +' does not exist in data path!')
-                continue
-
-            if train_set and images_folder_path.parents[0].name != 'train':
-                images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'train'))
-            if not train_set and images_folder_path.parents[0].name != 'test':
-                images_folder_path = shutil.move(str(images_folder_path), str(images_folder_path.parents[0]/'test'))
+            images_folder_path = data_root/Path(sequence_path).stem
 
             output_images_path = [str(images_folder_path/x.name.replace('.txt','.jpg')) for x in Path(sequence_path).iterdir()]
             f.write('\n'.join(output_images_path))
+            f.write('\n')
 
-def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_obj_frame = False):
+def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_obj_frame = False, train_set = True):
     '''This is a function that read images (sequences) from data_root and annotation data from ann_root
        The generated label data (given in the path label_root) in txt files are the one used for train.py
        TODO: all gen_labels_*.py do not include the traking id information to generate txt under labels_with_ids. 
        TODO: there is no object type from groundtruth written to labels_with_ids txt. Should has this option in the future
     '''
     label_root.mkdir(parents = True, exist_ok = True)
+    data_root = data_root/'train' if train_set and data_root.name != 'train' else data_root
+    data_root = data_root/'test' if not train_set and data_root.name != 'test' else data_root
+
+    if not data_root.exists():
+        data_root.mkdir(parents = True)
+        for sequence_path in data_root.parents[0].iterdir():
+            if train_set and sequence_path.name != 'train':
+                images_folder_path = shutil.move(str(sequence_path), str(images_folder_path.parents[0]/'train'))
+            if not train-set and sequence_path.name != 'test':
+                images_folder_path = shutil.move(str(sequence_path), str(images_folder_path.parents[0]/'test'))
+      
 
     for sequence_path in ann_root.iterdir():
         #if sequence_path.stem == 'MVI_39811':
@@ -170,9 +156,8 @@ if __name__ == '__main__':
     with cvat_label_path.open('w') as out_txt_file:
         for i in objects_names:
             print(i, file =out_txt_file )
-
+    
+    gen_labels_uadetrac(path_images, label_train, ann_train, objects_names, train_set = True)
+    gen_labels_uadetrac(path_images, label_val, ann_val,objects_names, train_set = False)
     gen_txt_sets_from_anno(dataset_name, path_images, label_train, train_set = True)
     gen_txt_sets_from_anno(dataset_name, path_images, label_val, train_set = False)
-    
-    #gen_labels_uadetrac(path_images/'train', label_train, ann_train, objects_names)
-    #gen_labels_uadetrac(path_images/'test', label_val, ann_val,objects_names)
