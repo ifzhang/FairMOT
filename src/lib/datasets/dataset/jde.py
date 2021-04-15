@@ -373,7 +373,13 @@ class JointDataset(LoadImagesAndLabels):  # for training
 
         for ds, label_paths in self.label_files.items():
             max_index = -1
+            print('Processing labels files ({}), please be patiend.'.format(len(label_paths)))
+            every_10_percent = int(len(label_paths)/10)
+            count = 0
             for lp in label_paths:
+                count +=1
+                if count % every_10_percent == 0:
+                    print('Finished {}%'.format(int(count/every_10_percent)))
                 lb = np.loadtxt(lp)
                 if len(lb) < 1:
                     continue
