@@ -1,5 +1,5 @@
 {
-    "root":"../../data/UA-DETRAC",
+    "root":"../../MOT_data/UA-DETRAC",
     "train":
     {
         "ua_detrac":"./data/UA-DETRAC.train"
