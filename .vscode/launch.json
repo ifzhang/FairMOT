@@ -11,13 +11,22 @@
             "request": "launch",
             "program": "${file}",
             "cwd": "${fileDirname}",
+            // For testing Varna
             //"args": ["mot","--input-video","../videos/video-clip.mp4","--output-root","../../demos/varna",
              //   "--load_model","models/fairmot_dla34.pth", "--conf_thres", "0.4", "--data_dir","../../MOT20"], 
             //"args": ["mot","--input-video","videos/MOT16-03.mp4","--output-root","../demos/MOT16",
             //    "--load_model","models/fairmot_dla34.pth", "--conf_thres", "0.4"], 
-            "args": ["mot","--exp_id","crowdhuman_dla34", "--gpus", "0", "--batch_size", "4", 
-                "--load_model", "models/fairmot_dla34.pth", "--num_epochs", "60", "--lr_step", "50",
-                "--data_cfg", "src/lib/cfg/crowdhuman.json", "--data_dir","../../MOT20"],
+
+            //For UA-DETRAC:
+            // "args": ["mot","--exp_id","ua_detrac_dla34", "--gpus", "0", "--batch_size", "4", 
+            //     "--load_model", "../models/fairmot_dla34.pth", "--num_epochs", "60", "--lr_step", "50",
+            //     "--data_cfg", "lib/cfg/ua_detrac.json", "--data_dir","../../UA-DETRAC"],
+
+            //For training on MOT17:
+            "args": ["mot","--exp_id","mot17_dla34", "--gpus", "0", "--batch_size", "4", 
+                "--load_model", "../models/fairmot_dla34.pth", "--num_epochs", "60", "--lr_step", "50",
+                "--data_cfg", "lib/cfg/mot17.json", "--data_dir","../../MOT_data"],
+
             "console": "integratedTerminal"
         }
     ]
