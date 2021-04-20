@@ -379,7 +379,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
             for lp in label_paths:
                 count +=1
                 if count % every_10_percent == 0:
-                    print('Finished {}%'.format(int(count/every_10_percent)))
+                    print('Finished {}0%'.format(int(count/every_10_percent)))
                 lb = np.loadtxt(lp)
                 if len(lb) < 1:
                     continue
