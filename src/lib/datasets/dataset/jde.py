@@ -359,7 +359,7 @@ class JointDataset(LoadImagesAndLabels):  # for training
         self.label_files = OrderedDict()
         self.tid_num = OrderedDict()
         self.tid_start_index = OrderedDict()
-        self.num_classes = 1
+        self.num_classes = 1 #TODO JointDataset limit the tracking to one class type only
 
         for ds, path in paths.items():
             with open(path, 'r') as file:
@@ -390,7 +390,9 @@ class JointDataset(LoadImagesAndLabels):  # for training
                 if img_max > max_index:
                     max_index = img_max
             self.tid_num[ds] = max_index + 1
-
+        # For fast debugging of UA-DETRAC
+        # self.tid_num[ds] = 342
+        
         last_index = 0
         for i, (k, v) in enumerate(self.tid_num.items()):
             self.tid_start_index[k] = last_index
