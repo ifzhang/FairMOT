@@ -24,7 +24,8 @@ for seq in seqs:
     seq_info = open(seq/'seqinfo.ini').read()
     seq_width = int(seq_info[seq_info.find('imWidth=') + 8:seq_info.find('\nimHeight')])
     seq_height = int(seq_info[seq_info.find('imHeight=') + 9:seq_info.find('\nimExt')])
-
+    total_frames = int(seq_info[seq_info.find('seqLength=') + 10:seq_info.find('\nimWidth')])
+    print('Processing sequence:{}, total frames:{}'.format(seq.name, total_frames))
     gt_txt = seq/'gt'/'gt.txt'
     gt = np.loadtxt(gt_txt, dtype=np.float64, delimiter=',')
 
