@@ -25,16 +25,16 @@ def gen_txt_sets_from_anno(dataset_name, data_root, label_root, train_set = True
 
     with output_path.open('w') as f:
         for sequence_path in label_root.iterdir():
-            images_folder_path = data_root/Path(sequence_path).stem
+            images_folder_path = Path(data_root.parts[-2], data_root.parts[-1],Path(sequence_path).stem)
 
-            output_images_path = [str(images_folder_path/x.name.replace('.txt','.jpg')) for x in Path(sequence_path).iterdir()]
+            #output_images_path = [str(images_folder_path.parents[2]/x.name.replace('.txt','.jpg')) for x in Path(sequence_path).iterdir()]
+            output_images_path = [str(images_folder_path/x.name.replace('.txt','.jpg')) for x in sequence_path.iterdir()]
             f.write('\n'.join(output_images_path))
             f.write('\n')
 
 def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_obj_frame = False, train_set = True):
     '''This is a function that read images (sequences) from data_root and annotation data from ann_root
        The generated label data (given in the path label_root) in txt files are the one used for train.py
-       TODO: all gen_labels_*.py do not include the traking id information to generate txt under labels_with_ids. 
        TODO: there is no object type from groundtruth written to labels_with_ids txt. Should has this option in the future
     '''
     label_root.mkdir(parents = True, exist_ok = True)
@@ -46,10 +46,14 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_
         for sequence_path in data_root.parents[0].iterdir():
             if train_set and sequence_path.name != 'train':
                 images_folder_path = shutil.move(str(sequence_path), str(images_folder_path.parents[0]/'train'))
-            if not train-set and sequence_path.name != 'test':
+            if not train_set and sequence_path.name != 'test':
                 images_folder_path = shutil.move(str(sequence_path), str(images_folder_path.parents[0]/'test'))
       
 
+    # clear label txt files before append 
+    for label_file in label_root.glob('**/**/*.txt'):
+        label_file.unlink()
+    
     for sequence_path in ann_root.iterdir():
         #if sequence_path.stem == 'MVI_39811':
         seq_imgs_path = data_root/sequence_path.stem
@@ -59,9 +63,7 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_
         print('Processing sequence:{}, total frames:{}'.format(sequence_path.name, total_frames))
         tree = ET.parse(sequence_path)
         root = tree.getroot()
-        fid = -1
         frame_index_counter = 0
-        tid_curr = 0
         for ann_data in root.iter():     
             if ann_data.tag == 'frame':
                 frame_index_counter += 1 
@@ -94,32 +96,33 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_
                 label_fpath = (label_root/sequence_path.stem/image_name).with_suffix('.txt')
                 if not label_fpath.parents[0].exists():
                     label_fpath.parents[0].mkdir(parents=True)
-                open(label_fpath,'w').close()
-                tid_curr = 0
-                for target in list(ann_data[0]):
-                    #tid_curr = int(target.attrib['id'])
-                    
-                    anns = target[0].attrib
-                    # Control target objects by the conditions provided in target[1].attrib
-                    # There are {orientation, speed, trajectory_length', 'truncation_ratio', 'vehicle_type'}
-                    if target[1].attrib['vehicle_type'] not in objects_names:
-                        print('Error that target object is not in provided class name list !')
-                        break
+                
+                with label_fpath.open('w') as f:
+                    tid_curr = 0
+                    for target in list(ann_data[0]):
+                        tid = int(target.attrib['id'])
 
-                    x, y, w, h = float(anns['left']), float(anns['top']), float(anns['width']), float(anns['height'])
-                    x += w / 2
-                    y += h / 2
-                    # Expected format: class id x_center/img_width y_center/img_height w/img_width h/img_height
-                    #label_str = '0 {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(
-                    #    tid_curr, x / img_width, y / img_height, w / img_width, h / img_height)
-                    
-                    # With the class id 
-                    label_str = '{:d} {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(objects_names.index(target[1].attrib['vehicle_type']),
-                        tid_curr, x / img_width, y / img_height, w / img_width, h / img_height)
+                        anns = target[0].attrib
+                        # Control target objects by the conditions provided in target[1].attrib
+                        # There are {orientation, speed, trajectory_length', 'truncation_ratio', 'vehicle_type'}
+                        if target[1].attrib['vehicle_type'] not in objects_names:
+                            print('Error that target object is not in provided class name list !')
+                            break
 
-                    with label_fpath.open('a') as f:
+                        x, y, w, h = float(anns['left']), float(anns['top']), float(anns['width']), float(anns['height'])
+                        x += w / 2
+                        y += h / 2
+                        # Expected format: class id x_center/img_width y_center/img_height w/img_width h/img_height
+
+                        # every objects as one class code
+                        label_str = '0 {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(
+                           tid, x / img_width, y / img_height, w / img_width, h / img_height)
+                        
+                        # # With the multiple classes TODO: use this code when we solve limitation in JointDataset that assign num_classes = 1
+                        # label_str = '{:d} {:d} {:.6f} {:.6f} {:.6f} {:.6f}\n'.format(objects_names.index(target[1].attrib['vehicle_type']),
+                        #     tid, x / img_width, y / img_height, w / img_width, h / img_height)
+
                         f.write(label_str)
-                    tid_curr += 1
 
         if keep_no_obj_frame:
             while frame_index_counter <= total_frames:
@@ -136,8 +139,11 @@ def gen_labels_uadetrac(data_root, label_root, ann_root, objects_names, keep_no_
 
 
 if __name__ == '__main__':
-    dataset_name = 'UA-DETRAC'
-    root_path = Path('../../MOT_data/UA-DETRAC')
+    dataset_name = 'UA-DETRAC_small'
+    root_path = Path('../../MOT_data/UA-DETRAC_small')
+
+    # dataset_name = 'UA-DETRAC'
+    # root_path = Path('../../MOT_data/UA-DETRAC')
 
     path_images = root_path/'images'
     
