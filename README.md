@@ -145,8 +145,17 @@ sh experiments/mot17_dla34.sh
 ```
 sh experiments/mot15_ft_mix_dla34.sh
 ```
-* Finetune on MOT20 using the baseline model:
+* Train on MOT20:
+The data annotation of MOT20 is a little different from MOT17, the coordinates of the bounding boxes are all inside the image, so we need to uncomment line 313 to 316 in the dataset file src/lib/datasets/dataset/jde.py:
 ```
+#np.clip(xy[:, 0], 0, width, out=xy[:, 0])
+#np.clip(xy[:, 2], 0, width, out=xy[:, 2])
+#np.clip(xy[:, 1], 0, height, out=xy[:, 1])
+#np.clip(xy[:, 3], 0, height, out=xy[:, 3])
+```
+Then, we can train on the mix dataset and finetune on MOT20:
+```
+sh experiments/mix_dla34.sh
 sh experiments/mot20_ft_mix_dla34.sh
 ```
 * For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA:
