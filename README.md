@@ -155,7 +155,8 @@ The data annotation of MOT20 is a little different from MOT17, the coordinates o
 ```
 Then, we can train on the mix dataset and finetune on MOT20:
 ```
-sh experiments/mix_dla34.sh
+sh experiments/crowdhuman_dla34.sh
+sh experiments/mix_ft_ch_dla34.sh
 sh experiments/mot20_ft_mix_dla34.sh
 ```
 * For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA:
