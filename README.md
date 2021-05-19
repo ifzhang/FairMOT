@@ -159,6 +159,7 @@ sh experiments/crowdhuman_dla34.sh
 sh experiments/mix_ft_ch_dla34.sh
 sh experiments/mot20_ft_mix_dla34.sh
 ```
+The MOT20 model 'mot20_fairmot.pth' can be downloaded here: [[Google]](https://drive.google.com/file/d/1HVzDTrYSSZiVqExqG9rou3zZXX1-GGQn/view?usp=sharing) [[Baidu, code:jmce]](https://pan.baidu.com/s/1bpMtu972ZszsBx4TzIT_CA).
 * For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA:
 ```
 sh experiments/mix_mot17_half_dla34.sh
