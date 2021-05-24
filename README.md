@@ -13,10 +13,11 @@ A simple baseline for one-shot multi-object tracking:
 There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. We hope this baseline could inspire and help evaluate new ideas in this field.
 
 ## News
+* (2020.05.24) A light version of FairMOT using yolov5s backbone is released! 
 * (2020.09.10) A new version of FairMOT is released! (73.7 MOTA on MOT17)
 
 ## Main updates
-* We pretrain FairMOT on the CrowdHuman dataset using a self-supervised learning approach.
+* We pretrain FairMOT on the CrowdHuman dataset using a weakly-supervised learning approach.
 * To detect bounding boxes outside the image, we use left, top, right and bottom (4 channel) to replace the WH head (2 channel). 
 
 ## Tracking performance
@@ -37,17 +38,18 @@ There has been remarkable progress on object detection and re-identification in 
 
 ## Installation
 * Clone this repo, and we'll call the directory that you cloned as ${FAIRMOT_ROOT}
-* Install dependencies. We use python 3.7 and pytorch >= 1.2.0
+* Install dependencies. We use python 3.8 and pytorch >= 1.7.0
 ```
 conda create -n FairMOT
 conda activate FairMOT
-conda install pytorch==1.2.0 torchvision==0.4.0 cudatoolkit=10.0 -c pytorch
+conda install pytorch==1.7.0 torchvision==0.8.0 cudatoolkit=10.2 -c pytorch
 cd ${FAIRMOT_ROOT}
+pip install cython
 pip install -r requirements.txt
 ```
-* We use [DCNv2](https://github.com/CharlesShang/DCNv2) in our backbone network and more details can be found in their repo. 
+* We use [DCNv2_pytorch_1.7](https://github.com/ifzhang/DCNv2/tree/pytorch_1.7) in our backbone network (pytorch_1.7 branch). Previous versions can be found in [DCNv2](https://github.com/CharlesShang/DCNv2).
 ```
-git clone https://github.com/CharlesShang/DCNv2
+git clone -b pytorch_1.7 https://github.com/ifzhang/DCNv2.git
 cd DCNv2
 ./make.sh
 ```
@@ -68,10 +70,15 @@ crowdhuman
    └------annotation_train.odgt
    └------annotation_val.odgt
 ```
-Then, you can change the paths in src/gen_labels_crowd.py and run:
+If you want to pretrain on CrowdHuman (we train Re-ID on CrowdHuman), you can change the paths in src/gen_labels_crowd_id.py and run:
 ```
 cd src
-python gen_labels_crowd.py
+python gen_labels_crowd_id.py
+```
+If you want to add CrowdHuman to the MIX dataset (we do not train Re-ID on CrowdHuman), you can change the paths in src/gen_labels_crowd_det.py and run:
+```
+cd src
+python gen_labels_crowd_det.py
 ```
 * **MIX**
 We use the same training data as [JDE](https://github.com/Zhongdao/Towards-Realtime-MOT) in this part and we call it "MIX". Please refer to their [DATA ZOO](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) to download and prepare all the training data including Caltech Pedestrian, CityPersons, CUHK-SYSU, PRW, ETHZ, MOT17 and MOT16. 
@@ -160,7 +167,7 @@ sh experiments/mix_ft_ch_dla34.sh
 sh experiments/mot20_ft_mix_dla34.sh
 ```
 The MOT20 model 'mot20_fairmot.pth' can be downloaded here: [[Google]](https://drive.google.com/file/d/1HVzDTrYSSZiVqExqG9rou3zZXX1-GGQn/view?usp=sharing) [[Baidu, code:jmce]](https://pan.baidu.com/s/1bpMtu972ZszsBx4TzIT_CA).
-* For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA:
+* For ablation study, we use MIX and half of MOT17 as training data, you can use different backbones such as ResNet, ResNet-FPN, HRNet and DLA::
 ```
 sh experiments/mix_mot17_half_dla34.sh
 sh experiments/mix_mot17_half_hrnet18.sh
@@ -176,6 +183,13 @@ The ablation study model 'mix_mot17_half_dla34.pth' can be downloaded here: [[Go
 |MOT17  | 69.8 | 69.9 | 3996                |
 |MIX       | 72.9 | 73.2 | 3345             |
 |CrowdHuman + MIX     | 73.7 | 72.3 | 3303  |
+* We use CrowdHuman, MIX and MOT17 to train the light version of FairMOT using yolov5s as backbone:
+```
+sh experiments/all_yolov5s.sh
+```
+The pretrained model of yolov5s on the COCO dataset can be downloaded here:  [[Google]](https://drive.google.com/file/d/1Ur3_pa9r3KRY-5qM2cdFhFJ5exghRJvh/view?usp=sharing) [[Baidu, code:wh9h]](https://pan.baidu.com/s/1JHjN_l1nkMnRHRF5TcHYXg).
+
+The model of the light version 'fairmot_yolov5s' can be downloaded here:  [[Google]](https://drive.google.com/file/d/1MEvsRPyoAqYSCdKaS5Ofrl7ZfKbBZ1Jb/view?usp=sharing) [[Baidu, code:2y3a]](https://pan.baidu.com/s/1dyBEeiGpRfZhqae0c264rg).
 
 ## Tracking
 * The default settings run tracking on the validation dataset from 2DMOT15. Using the baseline model, you can run:
@@ -195,6 +209,11 @@ If you use our pretrained model 'mix_mot17_half_dla34.pth', you can get 69.1 MOT
 cd src
 python track.py mot --test_mot17 True --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
 python track.py mot --test_mot16 True --load_model ../models/fairmot_dla34.pth --conf_thres 0.4
+```
+* To run tracking using the light version of FairMOT (68.5 MOTA on the test of MOT17), you can run:
+```
+cd src
+python track.py mot --test_mot17 True --load_model ../models/fairmot_yolov5s.pth --conf_thres 0.4 --arch yolo
 ```
 and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 73+ MOTA on MOT17 test set using the baseline model 'fairmot_dla34.pth'.)
 

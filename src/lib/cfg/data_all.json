@@ -7,7 +7,9 @@
         "citypersons":"./data/citypersons.train",
         "cuhksysu":"./data/cuhksysu.train",
         "prw":"./data/prw.train",
-        "eth":"./data/eth.train"
+        "eth":"./data/eth.train",
+        "crowdhuman_train":"./data/crowdhuman.train",
+        "crowdhuman_val":"./data/crowdhuman.val"
     },
     "test_emb":
     {

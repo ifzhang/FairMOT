@@ -93,6 +93,6 @@ def main(opt):
 
 
 if __name__ == '__main__':
-    os.environ['CUDA_VISIBLE_DEVICES'] = '0, 1'
+    torch.cuda.set_device(2)
     opt = opts().parse()
     main(opt)

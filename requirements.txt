@@ -1,6 +1,6 @@
 yacs
 opencv-python
-cython
+PyYAML
 cython-bbox
 scipy
 numba
@@ -11,3 +11,4 @@ lap
 openpyxl
 Pillow
 tensorboardX
+fvcore

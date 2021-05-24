@@ -9,6 +9,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 
+from fvcore.nn import sigmoid_focal_loss_jit
+
 from models.losses import FocalLoss, TripletLoss
 from models.losses import RegL1Loss, RegLoss, NormRegL1Loss, RegWeightedL1Loss
 from models.decode import mot_decode
@@ -30,6 +32,11 @@ class MotLoss(torch.nn.Module):
         self.emb_dim = opt.reid_dim
         self.nID = opt.nID
         self.classifier = nn.Linear(self.emb_dim, self.nID)
+        if opt.id_loss == 'focal':
+            torch.nn.init.normal_(self.classifier.weight, std=0.01)
+            prior_prob = 0.01
+            bias_value = -math.log((1 - prior_prob) / prior_prob)
+            torch.nn.init.constant_(self.classifier.bias, bias_value)
         self.IDLoss = nn.CrossEntropyLoss(ignore_index=-1)
         self.emb_scale = math.sqrt(2) * math.log(self.nID - 1)
         self.s_det = nn.Parameter(-1.85 * torch.ones(1))
@@ -60,12 +67,22 @@ class MotLoss(torch.nn.Module):
                 id_target = batch['ids'][batch['reg_mask'] > 0]
 
                 id_output = self.classifier(id_head).contiguous()
-                id_loss += self.IDLoss(id_output, id_target)
+                if self.opt.id_loss == 'focal':
+                    id_target_one_hot = id_output.new_zeros((id_head.size(0), self.nID)).scatter_(1,
+                                                                                                  id_target.long().view(
+                                                                                                      -1, 1), 1)
+                    id_loss += sigmoid_focal_loss_jit(id_output, id_target_one_hot,
+                                                      alpha=0.25, gamma=2.0, reduction="sum"
+                                                      ) / id_output.size(0)
+                else:
+                    id_loss += self.IDLoss(id_output, id_target)
 
         det_loss = opt.hm_weight * hm_loss + opt.wh_weight * wh_loss + opt.off_weight * off_loss
-
-        loss = torch.exp(-self.s_det) * det_loss + torch.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
-        loss *= 0.5
+        if opt.multi_loss == 'uncertainty':
+            loss = torch.exp(-self.s_det) * det_loss + torch.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
+            loss *= 0.5
+        else:
+            loss = det_loss + 0.1 * id_loss
 
         loss_stats = {'loss': loss, 'hm_loss': hm_loss,
                       'wh_loss': wh_loss, 'off_loss': off_loss, 'id_loss': id_loss}

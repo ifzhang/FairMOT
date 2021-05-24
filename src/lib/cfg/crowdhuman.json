@@ -1,5 +1,5 @@
 {
-    "root":"/data/yfzhang/MOT/JDE",
+    "root":"/home/zyf/dataset",
     "train":
     {
         "crowdhuman_train":"./data/crowdhuman.train",

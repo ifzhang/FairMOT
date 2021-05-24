@@ -1,5 +1,5 @@
 {
-    "root":"/data/yfzhang/MOT/JDE",
+    "root":"/home/zyf/dataset",
     "train":
     {
         "mot15":"./data/mot15.train"
