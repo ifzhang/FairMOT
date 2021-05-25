@@ -213,7 +213,7 @@ python track.py mot --test_mot16 True --load_model ../models/fairmot_dla34.pth -
 * To run tracking using the light version of FairMOT (68.5 MOTA on the test of MOT17), you can run:
 ```
 cd src
-python track.py mot --test_mot17 True --load_model ../models/fairmot_yolov5s.pth --conf_thres 0.4 --arch yolo
+python track.py mot --test_mot17 True --load_model ../models/fairmot_yolov5s.pth --conf_thres 0.4 --arch yolo --reid_dim 64
 ```
 and send the txt files to the [MOT challenge](https://motchallenge.net) evaluation server to get the results. (You can get the SOTA results 73+ MOTA on MOT17 test set using the baseline model 'fairmot_dla34.pth'.)
 
