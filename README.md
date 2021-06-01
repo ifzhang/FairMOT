@@ -13,7 +13,8 @@ A simple baseline for one-shot multi-object tracking:
 There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. We hope this baseline could inspire and help evaluate new ideas in this field.
 
 ## News
-* (2020.05.24) A light version of FairMOT using yolov5s backbone is released! 
+* (2021.06.01) A [nice re-implementation](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.1/configs/mot) by Baidu [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection)!
+* (2021.05.24) A light version of FairMOT using yolov5s backbone is released! 
 * (2020.09.10) A new version of FairMOT is released! (73.7 MOTA on MOT17)
 
 ## Main updates
