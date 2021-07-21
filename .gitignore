@@ -1,1 +1,17 @@
 .idea
+.python-version
+venv
+
+# Large files
+models
+data
+
+# dcn repo
+DCNv2
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+

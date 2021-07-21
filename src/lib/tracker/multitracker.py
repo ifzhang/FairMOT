@@ -1,13 +1,11 @@
-import itertools
-import os
-import os.path as osp
-import time
 from collections import deque
+from typing import Optional
 
 import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
+
 from models import *
 from models.decode import mot_decode
 from models.model import create_model, load_model
@@ -40,6 +38,7 @@ class STrack(BaseTrack):
         self.update_features(temp_feat)
         self.features = deque([], maxlen=buffer_size)
         self.alpha = 0.9
+        self.curr_feat: Optional[np.ndarray] = None
 
     def update_features(self, feat):
         feat /= np.linalg.norm(feat)
@@ -190,8 +189,8 @@ class JDETracker(object):
         self.buffer_size = int(frame_rate / 30.0 * opt.track_buffer)
         self.max_time_lost = self.buffer_size
         self.max_per_image = opt.K
-        self.mean = np.array(opt.mean, dtype=np.float32).reshape(1, 1, 3)
-        self.std = np.array(opt.std, dtype=np.float32).reshape(1, 1, 3)
+        self.mean = np.array(opt.mean, dtype=np.float32).reshape((1, 1, 3))
+        self.std = np.array(opt.std, dtype=np.float32).reshape((1, 1, 3))
 
         self.kalman_filter = KalmanFilter()
 

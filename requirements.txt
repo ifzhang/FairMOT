@@ -1,6 +1,7 @@
 yacs
 opencv-python
 PyYAML
+Cython
 cython-bbox
 scipy
 progress
@@ -11,3 +12,4 @@ openpyxl
 Pillow
 tensorboardX
 fvcore
+ipython
