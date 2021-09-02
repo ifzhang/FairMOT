@@ -2,7 +2,7 @@ import os
 from typing import Dict
 import numpy as np
 
-from tracking_utils.log import logger
+from src.lib.tracking_utils.log import logger
 
 
 def write_results(filename, results_dict: Dict, data_type: str):

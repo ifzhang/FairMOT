@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _init_paths
 import os
 import os.path as osp
 import cv2
@@ -12,15 +11,15 @@ import motmetrics as mm
 import numpy as np
 import torch
 
-from tracker.multitracker import JDETracker
-from tracking_utils import visualization as vis
-from tracking_utils.log import logger
-from tracking_utils.timer import Timer
-from tracking_utils.evaluation import Evaluator
-import datasets.dataset.jde as datasets
+from src.lib.tracker.multitracker import JDETracker
+from src.lib.tracking_utils import visualization as vis
+from src.lib.tracking_utils.log import logger
+from src.lib.tracking_utils.timer import Timer
+from src.lib.tracking_utils.evaluation import Evaluator
+import src.lib.datasets.dataset.jde as datasets
 
-from tracking_utils.utils import mkdir_if_missing
-from opts import opts
+from src.lib.tracking_utils.utils import mkdir_if_missing
+from src.lib.opts import opts
 
 
 def write_results(filename, results, data_type):

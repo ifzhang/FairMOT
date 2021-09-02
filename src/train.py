@@ -2,20 +2,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _init_paths
-
 import os
 
 import json
 import torch
 import torch.utils.data
 from torchvision.transforms import transforms as T
-from opts import opts
-from models.model import create_model, load_model, save_model
-from models.data_parallel import DataParallel
-from logger import Logger
-from datasets.dataset_factory import get_dataset
-from trains.train_factory import train_factory
+from src.lib.opts import opts
+from src.lib.models.model import create_model, load_model, save_model
+from src.lib.models.data_parallel import DataParallel
+from src.lib.logger import Logger
+from src.lib.datasets.dataset_factory import get_dataset
+from src.lib.trains.train_factory import train_factory
 
 
 def main(opt):
