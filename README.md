@@ -16,17 +16,7 @@ There has been remarkable progress on object detection and re-identification in 
 * (2021.08.03) Our paper is accepted by IJCV!
 * (2021.06.01) A [nice re-implementation](https://github.com/PaddlePaddle/PaddleDetection/tree/release/2.1/configs/mot) by Baidu [PaddleDetection](https://github.com/PaddlePaddle/PaddleDetection)!
 * (2021.05.24) A light version of FairMOT using yolov5s backbone is released! 
-* (2020.09.10) A new version of FairMOT is released! (73.7 MOTA on MOT17)
 
-## Main updates
-* We pretrain FairMOT on the CrowdHuman dataset using a weakly-supervised learning approach.
-* To detect bounding boxes outside the image, we use left, top, right and bottom (4 channel) to replace the WH head (2 channel). 
-
-## Tracking performance
-### Results on MOT challenge test set
-| Dataset    |  MOTA | IDF1 | IDS | MT | ML | FPS |
-|--------------|-----------|--------|-------|----------|----------|--------|
-|2DMOT15  | 60.6 | 64.7 |  591 | 47.6% | 11.0% | 30.5 |
 |MOT16       | 74.9 | 72.8 | 1074 | 44.7% | 15.9% | 25.9 |
 |MOT17       | 73.7 | 72.3 | 3303 | 43.2% | 17.3% | 25.9 |
 |MOT20       | 61.8 | 67.3 | 5243 | 68.8% | 7.6% | 13.2 |
