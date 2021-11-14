@@ -93,6 +93,5 @@ def main(opt):
 
 
 if __name__ == '__main__':
-    torch.cuda.set_device(2)
     opt = opts().parse()
     main(opt)
