@@ -253,7 +253,8 @@ A large part of the code is borrowed from [Zhongdao/Towards-Realtime-MOT](https:
   title={Fairmot: On the fairness of detection and re-identification in multiple object tracking},
   author={Zhang, Yifu and Wang, Chunyu and Wang, Xinggang and Zeng, Wenjun and Liu, Wenyu},
   journal={International Journal of Computer Vision},
-  pages={1--19},
+  volume={129},
+  pages={3069--3087},
   year={2021},
   publisher={Springer}
 }
