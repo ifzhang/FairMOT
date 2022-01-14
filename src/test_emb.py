@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _init_paths
 import argparse
 import torch
 import json
@@ -16,13 +15,13 @@ from scipy import interpolate
 import numpy as np
 from torchvision.transforms import transforms as T
 import torch.nn.functional as F
-from models.model import create_model, load_model
-from datasets.dataset.jde import JointDataset, collate_fn
-from models.utils import _tranpose_and_gather_feat
-from utils.utils import xywh2xyxy, ap_per_class, bbox_iou
-from opts import opts
-from models.decode import mot_decode
-from utils.post_process import ctdet_post_process
+from src.lib.models.model import create_model, load_model
+from src.lib.datasets.dataset.jde import JointDataset, collate_fn
+from src.lib.models.utils import _tranpose_and_gather_feat
+from src.lib.utils.utils import xywh2xyxy, ap_per_class, bbox_iou
+from src.lib.opts import opts
+from src.lib.models.decode import mot_decode
+from src.lib.utils.post_process import ctdet_post_process
 
 
 def test_emb(

@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _init_paths
 import os
 import os.path as osp
 import cv2
@@ -11,18 +10,17 @@ import argparse
 import motmetrics as mm
 import numpy as np
 
-from tracker.fusetracker import FuseTracker
-from tracking_utils import visualization as vis
-from tracking_utils.log import logger
-from tracking_utils.timer import Timer
-from tracking_utils.evaluation import Evaluator
-import datasets.dataset.jde as datasets
+from src.lib.tracking_utils import visualization as vis
+from src.lib.tracking_utils.log import logger
+from src.lib.tracking_utils.timer import Timer
+from src.lib.tracking_utils.evaluation import Evaluator
+import src.lib.datasets.dataset.jde as datasets
 import torch
-from tracking_utils.utils import mkdir_if_missing, tlbr2tlwh
-from opts import opts
-from models.decode import mot_decode
-from utils.post_process import ctdet_post_process
-from models.model import create_model, load_model
+from src.lib.tracking_utils.utils import mkdir_if_missing
+from src.lib.opts import opts
+from src.lib.models.decode import mot_decode
+from src.lib.utils.post_process import ctdet_post_process
+from src.lib.models.model import create_model, load_model
 
 
 def write_results_score(filename, results):

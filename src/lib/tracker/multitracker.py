@@ -8,17 +8,17 @@ import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
-from models import *
-from models.decode import mot_decode
-from models.model import create_model, load_model
-from models.utils import _tranpose_and_gather_feat
-from tracking_utils.kalman_filter import KalmanFilter
-from tracking_utils.log import logger
-from tracking_utils.utils import *
-from utils.image import get_affine_transform
-from utils.post_process import ctdet_post_process
+from src.lib.models import *
+from src.lib.models.decode import mot_decode
+from src.lib.models.model import create_model, load_model
+from src.lib.models.utils import _tranpose_and_gather_feat
+from src.lib.tracking_utils.kalman_filter import KalmanFilter
+from src.lib.tracking_utils.log import logger
+from src.lib.tracking_utils.utils import *
+from src.lib.utils.image import get_affine_transform
+from src.lib.utils.post_process import ctdet_post_process
 
-from tracker import matching
+from src.lib.tracker import matching
 
 from .basetrack import BaseTrack, TrackState
 

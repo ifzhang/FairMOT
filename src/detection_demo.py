@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _init_paths
 import argparse
 import torch
 import json
@@ -12,12 +11,12 @@ import cv2
 
 import numpy as np
 import torch.nn.functional as F
-import datasets.dataset.jde as datasets
+import src.lib.datasets.dataset.jde as datasets
 from torchvision.transforms import transforms as T
-from models.model import create_model, load_model
-from models.decode import mot_decode
-from models.utils import _tranpose_and_gather_feat
-from utils.post_process import ctdet_post_process
+from src.lib.models.model import create_model, load_model
+from src.lib.models.decode import mot_decode
+from src.lib.models.utils import _tranpose_and_gather_feat
+from src.lib.utils.post_process import ctdet_post_process
 
 
 max_per_image = 500
