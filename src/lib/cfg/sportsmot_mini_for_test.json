@@ -1,0 +1,15 @@
+{
+    "root":"/home/fc/datasets",
+    "train":
+    {
+        "mot17":"./data/sportsmot_mini_for_test.train"
+    },
+    "test_emb":
+    {
+        "mot17":"./data/sportsmot.val"
+    },
+    "test":
+    {
+        "mot17":"./data/sportsmot.val"
+    }
+}

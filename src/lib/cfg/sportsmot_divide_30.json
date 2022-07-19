@@ -1,0 +1,15 @@
+{
+    "root":"/home/fc/datasets/sportsmot_divide",
+    "train":
+    {
+        "mot17":"./data/sportsmot_divide_30.train"
+    },
+    "test_emb":
+    {
+        "mot17":"./data/sportsmot_divide_30.train"
+    },
+    "test":
+    {
+        "mot17":"./data/sportsmot_divide_30.train"
+    }
+}
